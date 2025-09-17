@@ -1,9 +1,8 @@
 package com.cymark.estatemanagementsystem.service;
 
 import com.cymark.estatemanagementsystem.model.dto.RoleDto;
-import com.cymark.estatemanagementsystem.model.dto.RoleDtoRequest;
-import com.cymark.estatemanagementsystem.model.dto.RoleRequest;
-import com.cymark.estatemanagementsystem.model.dto.RoleUpdateRequest;
+import com.cymark.estatemanagementsystem.model.dto.request.RoleDtoRequest;
+import com.cymark.estatemanagementsystem.model.dto.request.RoleUpdateRequest;
 import com.cymark.estatemanagementsystem.model.entity.Role;
 import com.cymark.estatemanagementsystem.model.response.PaginatedResponse;
 import com.cymark.estatemanagementsystem.model.response.Response;

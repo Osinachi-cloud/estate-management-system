@@ -1,4 +1,4 @@
-package com.cymark.estatemanagementsystem.model.dto;
+package com.cymark.estatemanagementsystem.model.dto.request;
 
 
 import lombok.Data;

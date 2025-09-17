@@ -4,7 +4,6 @@ import com.cymark.estatemanagementsystem.exception.CymarkException;
 import com.cymark.estatemanagementsystem.exception.UserNotFoundException;
 import com.cymark.estatemanagementsystem.model.dto.PermissionByCategoryDto;
 import com.cymark.estatemanagementsystem.model.dto.PermissionDto;
-import com.cymark.estatemanagementsystem.model.dto.PermissionRequest;
 import com.cymark.estatemanagementsystem.model.entity.Permission;
 import com.cymark.estatemanagementsystem.model.entity.Role;
 import com.cymark.estatemanagementsystem.model.entity.UserEntity;

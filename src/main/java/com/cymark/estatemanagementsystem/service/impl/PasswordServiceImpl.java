@@ -2,7 +2,7 @@ package com.cymark.estatemanagementsystem.service.impl;
 
 import com.cymark.estatemanagementsystem.exception.PasswordException;
 import com.cymark.estatemanagementsystem.exception.UserNotFoundException;
-import com.cymark.estatemanagementsystem.model.dto.PasswordResetRequest;
+import com.cymark.estatemanagementsystem.model.dto.request.PasswordResetRequest;
 import com.cymark.estatemanagementsystem.model.entity.PasswordReset;
 import com.cymark.estatemanagementsystem.model.entity.UserEntity;
 import com.cymark.estatemanagementsystem.model.enums.ResponseStatus;
@@ -71,7 +71,7 @@ public class PasswordServiceImpl implements PasswordService {
             passwordReset.setGeneratedOn(Instant.now());
 
             passwordReset.setExpiredOn(Instant.now().plus(15, ChronoUnit.MINUTES));
-            passwordResetRepository.saveAndFlush(passwordReset);
+            passwordResetRepository.save(passwordReset);
 
 //            log.info("Customer [{}] has requested a password reset process and reset code sent to email [{}]", customer.getUserId(), customer.getEmailAddress());
             return ResponseUtils.createSuccessResponse("Password reset code sent to email");
@@ -124,7 +124,7 @@ public class PasswordServiceImpl implements PasswordService {
             passwordReset.setVerified(true);
             passwordResetRepository.save(passwordReset);
 
-//            log.info("Customer [{}] password reset successfully", customer.getUserId());
+            log.info("Customer [{}] password reset successfully", customer.getEmailAddress());
             return ResponseUtils.createDefaultSuccessResponse();
 
         } catch (Exception e) {
@@ -193,14 +193,12 @@ public class PasswordServiceImpl implements PasswordService {
             throw new PasswordException(ResponseStatus.EXPIRED_RESET_CODE);
         }
 
-
         try {
             passwordReset.setVerified(true);
-            passwordResetRepository.saveAndFlush(passwordReset);
+            passwordResetRepository.save(passwordReset);
 
             log.info("Password reset code [{}] successfully verified", passwordReset.getEmailAddress());
             return ResponseUtils.createSuccessResponse("Successful");
-
         } catch (Exception e) {
             log.error("Failed to validate password reset code sent to email [{}]", passwordReset.getEmailAddress(), e);
             throw new PasswordException(ResponseStatus.PROCESSING_ERROR);

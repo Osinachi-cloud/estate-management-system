@@ -1,11 +1,12 @@
 package com.cymark.estatemanagementsystem.service.impl;
 
-import com.cymark.estatemanagementsystem.exception.ContactVerificationException;
-import com.cymark.estatemanagementsystem.exception.CymarkException;
-import com.cymark.estatemanagementsystem.exception.UserException;
-import com.cymark.estatemanagementsystem.exception.UserNotFoundException;
+import com.cymark.estatemanagementsystem.exception.*;
 import com.cymark.estatemanagementsystem.model.dto.*;
+import com.cymark.estatemanagementsystem.model.dto.request.CustomerRequest;
+import com.cymark.estatemanagementsystem.model.dto.request.CustomerUpdateRequest;
+import com.cymark.estatemanagementsystem.model.dto.request.PasswordResetRequest;
 import com.cymark.estatemanagementsystem.model.entity.ContactVerification;
+import com.cymark.estatemanagementsystem.model.entity.PasswordReset;
 import com.cymark.estatemanagementsystem.model.entity.Role;
 import com.cymark.estatemanagementsystem.model.entity.UserEntity;
 import com.cymark.estatemanagementsystem.model.enums.ResponseStatus;
@@ -21,9 +22,7 @@ import com.cymark.estatemanagementsystem.specification.UserSpecification;
 import com.cymark.estatemanagementsystem.util.NumberUtils;
 import com.cymark.estatemanagementsystem.util.ResponseUtils;
 import com.cymark.estatemanagementsystem.util.UserValidationUtils;
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeanWrapper;
@@ -32,7 +31,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -446,12 +444,12 @@ public class UserServiceImpl implements UserService {
 
         if (!passwordService.passwordMatch(pin, customer.getPin())) {
             customer.setPinAttempts(count + 1);
-            userRepository.saveAndFlush(customer);
+            userRepository.save(customer);
             throw new UserException(ResponseStatus.WRONG_PIN);
         }
 
         customer.setPinAttempts(0);
-        userRepository.saveAndFlush(customer);
+        userRepository.save(customer);
 
         return ResponseUtils.createDefaultSuccessResponse();
     }
@@ -615,6 +613,4 @@ public class UserServiceImpl implements UserService {
 
         return ResponseUtils.createSuccessResponse(user.isEnabled() ? "successfully enabled" : "successfully disabled");
     }
-
-
 }

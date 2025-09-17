@@ -1,6 +1,6 @@
 package com.cymark.estatemanagementsystem.service;
 
-import com.cymark.estatemanagementsystem.model.dto.PasswordResetRequest;
+import com.cymark.estatemanagementsystem.model.dto.request.PasswordResetRequest;
 import com.cymark.estatemanagementsystem.model.response.Response;
 
 public interface PasswordService {

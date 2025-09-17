@@ -1,8 +1,8 @@
 package com.cymark.estatemanagementsystem.service;
 
 import com.cymark.estatemanagementsystem.exception.ContactVerificationException;
-import com.cymark.estatemanagementsystem.model.dto.EmailVerificationRequest;
-import com.cymark.estatemanagementsystem.model.dto.VerificationResponse;
+import com.cymark.estatemanagementsystem.model.dto.request.EmailVerificationRequest;
+import com.cymark.estatemanagementsystem.model.dto.response.VerificationResponse;
 
 public interface ContactVerificationService {
 

@@ -2,6 +2,8 @@ package com.cymark.estatemanagementsystem.service.impl;
 
 import com.cymark.estatemanagementsystem.exception.CymarkException;
 import com.cymark.estatemanagementsystem.model.dto.*;
+import com.cymark.estatemanagementsystem.model.dto.request.RoleDtoRequest;
+import com.cymark.estatemanagementsystem.model.dto.request.RoleUpdateRequest;
 import com.cymark.estatemanagementsystem.model.entity.Permission;
 import com.cymark.estatemanagementsystem.model.entity.Role;
 import com.cymark.estatemanagementsystem.model.entity.UserEntity;

@@ -2,11 +2,13 @@ package com.cymark.estatemanagementsystem.service;
 
 
 import com.cymark.estatemanagementsystem.model.dto.*;
+import com.cymark.estatemanagementsystem.model.dto.request.CustomerRequest;
+import com.cymark.estatemanagementsystem.model.dto.request.CustomerUpdateRequest;
+import com.cymark.estatemanagementsystem.model.dto.request.PasswordResetRequest;
 import com.cymark.estatemanagementsystem.model.entity.UserEntity;
 import com.cymark.estatemanagementsystem.model.request.AdminCustomerRequest;
 import com.cymark.estatemanagementsystem.model.response.PaginatedResponse;
 import com.cymark.estatemanagementsystem.model.response.Response;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
