@@ -1,19 +1,20 @@
 package com.cymark.estatemanagementsystem.service.impl;
 
 import com.cymark.estatemanagementsystem.service.NotificationService;
+import com.twilio.Twilio;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Service;
-import com.twilio.Twilio;
 import com.twilio.rest.api.v2010.account.Message;
 import com.twilio.type.PhoneNumber;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 
 @Slf4j
 @Service
@@ -81,6 +82,23 @@ public class NotificationServiceImpl implements NotificationService {
             log.error("Failed to send OTP to phone: {}", phoneNumber, e);
             throw new RuntimeException("Failed to send SMS OTP", e);
         }
+    }
+
+    public void sendOtp(String toPhoneNumber, String otp) {
+        String messageBody = "Your OTP code is: " + otp;
+        Message message = Message.creator(
+                        new PhoneNumber(toPhoneNumber),
+                        new PhoneNumber(twilioPhoneNumber),
+                        messageBody)
+                .create();
+        log.info("Sent message SID: {}", message.getSid());
+    }
+
+    @PostConstruct
+    public void init() {
+        System.out.println("hi twilio 1");
+        sendOtp("+2348108040995", "124605");
+        System.out.println("hi twilio 2");
     }
 
     @Override

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.exc.UnrecognizedPropertyException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureException;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -40,13 +39,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<BaseResponse<?>> handleException(Exception ex) {
         log.error("Unhandled exception occurred: {}", ex.getMessage(), ex);
 
-        ErrorResponse errorResponse = ErrorResponse.of(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred. Please try again later."
-        );
-
         return new ResponseEntity<>(
-                BaseResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, errorResponse.getError()),
+                BaseResponse.error(
+                        HttpStatus.INTERNAL_SERVER_ERROR,
+                        "An unexpected error occurred. Please try again later."
+                ),
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }
@@ -136,14 +133,14 @@ public class GlobalExceptionHandler {
             fieldErrors.put(fieldName, errorMessage);
         });
 
-        ErrorResponse errorResponse = ErrorResponse.of(
-                HttpStatus.BAD_REQUEST,
-                "Validation failed. Please check your input.",
-                fieldErrors
-        );
+        // Convert field errors to a readable string
+        String errorMessage = "Validation failed. Please check your input.";
+        if (!fieldErrors.isEmpty()) {
+            errorMessage += " Errors: " + fieldErrors.toString();
+        }
 
         return new ResponseEntity<>(
-                BaseResponse.error(HttpStatus.BAD_REQUEST, errorResponse),
+                BaseResponse.error(HttpStatus.BAD_REQUEST, errorMessage),
                 HttpStatus.BAD_REQUEST
         );
     }
