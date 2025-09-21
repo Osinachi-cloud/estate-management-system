@@ -40,7 +40,7 @@ public class ContactVerificationServiceImpl implements ContactVerificationServic
             throw new ContactVerificationException(ResponseStatus.INVALID_EMAIL_ADDRESS);
         }
 
-        boolean userExists = customerRepository.existsByEmailAddress(emailAddress);
+        boolean userExists = customerRepository.existsByEmail(emailAddress);
 
         if (userExists) {
             log.error("A customer with the email address [{}] already exists", emailAddress);

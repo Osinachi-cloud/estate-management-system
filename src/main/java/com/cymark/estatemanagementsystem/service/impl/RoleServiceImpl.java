@@ -106,7 +106,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Response assignRole(String roleName, String phoneNumber) {
 
-        UserEntity admin = adminRepository.findByPhoneNumber(phoneNumber).orElseThrow(()-> new CymarkException("admin with id:" + phoneNumber + " does not exist"));
+        UserEntity admin = adminRepository.findByPhone(phoneNumber).orElseThrow(()-> new CymarkException("admin with id:" + phoneNumber + " does not exist"));
         Role role = roleRepository.findByName(roleName).orElseThrow(()-> new CymarkException("role with name:" + roleName + " does not exist"));
 
         admin.setRole(role);

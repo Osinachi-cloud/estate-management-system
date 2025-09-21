@@ -32,6 +32,10 @@ public class CustomerRequest {
     @NotBlank(message = "designation cannot be blank")
     private Designation designation;
 
+    @NotBlank(message = "reference code cannot be blank")
+    @NotNull(message = "reference code cannot be null")
+    private String estateId;
+
     @NotBlank(message = "Password cannot be blank")
     @ValidPassword
     private String password;

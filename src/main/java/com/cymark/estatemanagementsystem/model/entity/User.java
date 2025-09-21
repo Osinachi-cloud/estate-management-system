@@ -21,10 +21,10 @@ public abstract class User  extends BaseEntity {
     protected String middleName;
 
     @Column(name = "email_address", unique = true)
-    protected String emailAddress;
+    protected String email;
 
-    @Column(name = "phone_number", unique = true, nullable = false)
-    protected String phoneNumber;
+    @Column(name = "phone_number", nullable = false)
+    protected String phone;
 
     @Column(name = "password")
     protected String password;

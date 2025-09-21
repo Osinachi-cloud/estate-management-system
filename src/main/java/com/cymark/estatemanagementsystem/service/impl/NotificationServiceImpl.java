@@ -94,12 +94,12 @@ public class NotificationServiceImpl implements NotificationService {
         log.info("Sent message SID: {}", message.getSid());
     }
 
-    @PostConstruct
-    public void init() {
-        System.out.println("hi twilio 1");
-        sendOtp("+2348108040995", "124605");
-        System.out.println("hi twilio 2");
-    }
+//    @PostConstruct
+//    public void init() {
+//        System.out.println("hi twilio 1");
+//        sendOtp("+2348108040995", "124605");
+//        System.out.println("hi twilio 2");
+//    }
 
     @Override
     public void sendOtpToEmail(String emailAddress, String otpCode, String subjectTemplate) {

@@ -79,7 +79,7 @@ public class PermissionServiceImpl implements PermissionService {
     @Override
     public Response assignPermission(String phone, String permissionName) {
 
-        UserEntity admin = userRepository.findByPhoneNumber(phone).orElseThrow(()-> new UserNotFoundException("admin with id:" + phone + " does not exist"));
+        UserEntity admin = userRepository.findByPhone(phone).orElseThrow(()-> new UserNotFoundException("admin with id:" + phone + " does not exist"));
         Permission permission = permissionRepository.findByName(permissionName).orElseThrow(()-> new CymarkException("permission with name:" + permissionName + " does not exist"));
 
         Role role = admin.getRole();

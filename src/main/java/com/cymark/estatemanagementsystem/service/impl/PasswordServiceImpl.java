@@ -53,7 +53,7 @@ public class PasswordServiceImpl implements PasswordService {
             throw new PasswordException(ResponseStatus.INVALID_EMAIL_ADDRESS);
         }
 
-        Optional<UserEntity> optionalCustomer = customerRepository.findByEmailAddress(emailAddress);
+        Optional<UserEntity> optionalCustomer = customerRepository.findByEmail(emailAddress);
 
         if (optionalCustomer.isEmpty()) {
             log.error("A customer with email address [{}] not found for password reset", emailAddress);
@@ -114,7 +114,7 @@ public class PasswordServiceImpl implements PasswordService {
 
         try {
 
-            UserEntity customer = customerRepository.findByEmailAddress(passwordReset.getEmailAddress())
+            UserEntity customer = customerRepository.findByEmail(passwordReset.getEmailAddress())
                     .orElseThrow(() -> new UserNotFoundException(ResponseStatus.USER_NOT_FOUND));
 
             customer.setPassword(encode(passwordResetRequest.getNewPassword()));
@@ -124,7 +124,7 @@ public class PasswordServiceImpl implements PasswordService {
             passwordReset.setVerified(true);
             passwordResetRepository.save(passwordReset);
 
-            log.info("Customer [{}] password reset successfully", customer.getEmailAddress());
+            log.info("Customer [{}] password reset successfully", customer.getEmail());
             return ResponseUtils.createDefaultSuccessResponse();
 
         } catch (Exception e) {

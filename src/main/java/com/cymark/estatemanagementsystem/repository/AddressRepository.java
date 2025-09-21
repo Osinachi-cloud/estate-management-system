@@ -1,9 +1,9 @@
 package com.cymark.estatemanagementsystem.repository;
 
-import com.cymark.estatemanagementsystem.model.entity.Otp;
+import com.cymark.estatemanagementsystem.model.entity.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface OtpRepository extends JpaRepository<Otp, Long> {
+public interface AddressRepository extends JpaRepository<Address, Long> {
 }

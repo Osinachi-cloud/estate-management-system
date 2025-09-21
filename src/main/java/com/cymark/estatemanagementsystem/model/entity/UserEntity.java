@@ -6,11 +6,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
 
+import java.util.Collection;
+
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 
 
 @Getter
 @Setter
-@Audited
+@Audited(targetAuditMode = NOT_AUDITED)
 @Entity
 @Table(name = "USER_ENTITY")
 public class UserEntity extends User {
@@ -21,8 +24,11 @@ public class UserEntity extends User {
     @Column(name = "profile_image")
     private String profileImage;
 
-//    @Column(name = "user_id", unique = true, nullable = false)
-//    private String userId;
+    @Column(name = "estate_id", nullable = false)
+    private String estateId;
+
+    @Column(name = "user_id", unique = true, nullable = false)
+    private String userId = phone + estateId;
 
     @Column(name = "pin")
     private String pin;
@@ -56,8 +62,17 @@ public class UserEntity extends User {
     @JoinColumn(name = "role_id", referencedColumnName = "id")
     private Role role;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
-    private Address address;
+//    @OneToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "address_id", referencedColumnName = "id")
+//    private Address address;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_address",
+            joinColumns = @JoinColumn(
+                    name = "user_id", referencedColumnName = "user_id"),
+            inverseJoinColumns = @JoinColumn(
+                    name = "address_id", referencedColumnName = "id"))
+    private Collection<Address> addresses;
 
 }

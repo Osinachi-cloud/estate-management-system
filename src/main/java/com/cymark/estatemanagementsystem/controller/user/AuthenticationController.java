@@ -32,6 +32,13 @@ public class AuthenticationController {
     private final UserService userService;
 
     @Unsecured
+    @PostMapping("/create-customer")
+    public ResponseEntity<BaseResponse<CustomerDto>> createCustomer(@RequestBody @Valid CustomerRequest customerRequest) {
+        CustomerDto customer = userService.createCustomer(customerRequest);
+        return new ResponseEntity<>(BaseResponse.success(customer, "Customer created successfully"), CREATED);
+    }
+
+    @Unsecured
     @PostMapping("/customer-login")
     public ResponseEntity<BaseResponse<LoginResponse>> customerLogin(@RequestBody @Valid LoginRequest loginRequest) {
         LoginResponse loginResponse = authenticationService.authenticate(loginRequest);
@@ -65,14 +72,6 @@ public class AuthenticationController {
     public ResponseEntity<BaseResponse<Response>> validatePasswordResetCode(@RequestBody @Valid PasswordResetRequest passwordResetRequest) {
         Response response = userService.validatePasswordResetCode(passwordResetRequest);
         return ResponseEntity.ok(BaseResponse.success(response, "Reset code validated successfully"));
-    }
-
-
-    @Unsecured
-    @PostMapping("/create-customer")
-    public ResponseEntity<BaseResponse<CustomerDto>> createCustomer(@RequestBody @Valid CustomerRequest customerRequest) {
-        CustomerDto customer = userService.createCustomer(customerRequest);
-        return new ResponseEntity<>(BaseResponse.success(customer, "Customer created successfully"), CREATED);
     }
 
     @PreAuthorize("hasAuthority('CREATE_USER')")

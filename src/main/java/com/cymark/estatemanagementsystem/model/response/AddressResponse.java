@@ -1,18 +1,17 @@
-package com.cymark.estatemanagementsystem.model.dto;
+package com.cymark.estatemanagementsystem.model.response;
 
-
-import com.cymark.estatemanagementsystem.model.entity.Estate;
+import com.cymark.estatemanagementsystem.model.dto.EstateDto;
+import com.cymark.estatemanagementsystem.model.dto.UserDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddressDto {
+public class AddressResponse {
 
     private String country;
     private String state;
@@ -22,6 +21,8 @@ public class AddressDto {
     private String apartmentNumber;
     private String postalCode;
     private String fullAddress;
-    private String estateId;
-    private String userId;
+    private EstateDto estateDto;
+    private UserDto userDto;
 }
+
+

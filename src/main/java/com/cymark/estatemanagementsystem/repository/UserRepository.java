@@ -10,14 +10,11 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends RevisionRepository<UserEntity, Long, Integer>, JpaRepository<UserEntity, Long>, JpaSpecificationExecutor<UserEntity> {
-    boolean existsByEmailAddress(String emailAddress);
+    boolean existsByEmail(String emailAddress);
 
-    Optional<UserEntity> findByEmailAddress(String emailAddress);
+    Optional<UserEntity> findByEmail(String emailAddress);
 
-//    Optional<UserEntity> findByUsername(String username);
+    Optional<UserEntity> findByPhone(String phoneNumber);
 
-    Optional<UserEntity> findByPhoneNumber(String phoneNumber);
-
-
-//    Optional<UserEntity> findByUserId(String customerId);
+    Optional<UserEntity> findByUserId(String customerId);
 }

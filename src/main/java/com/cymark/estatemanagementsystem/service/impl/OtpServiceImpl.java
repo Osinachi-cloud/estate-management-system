@@ -42,7 +42,7 @@ public class OtpServiceImpl implements OtpService {
             throw new PasswordException(ResponseStatus.INVALID_EMAIL_ADDRESS);
         }
 
-        Optional<UserEntity> optionalCustomer = userRepository.findByEmailAddress(emailAddress);
+        Optional<UserEntity> optionalCustomer = userRepository.findByEmail(emailAddress);
 
         if (optionalCustomer.isEmpty()) {
             log.error("A customer with email address [{}] not found for password reset", emailAddress);

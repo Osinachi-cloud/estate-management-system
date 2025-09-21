@@ -39,23 +39,6 @@ public class UserController {
     private final AuthenticationService authenticationService;
     private final ContactVerificationService verificationService;
 
-//    @PreAuthorize("hasAuthority('TOGGLE_ENABLE_USER')")
-//    @PostMapping("/toggle-enable-user")
-//    public ResponseEntity<Response> adminEnableUser(@RequestParam String phone) {
-//        log.info("PhoneNum : {} ",phone);
-//        return new ResponseEntity<>(userService.toggleEnableUser(phone), OK);
-//    }
-//
-//    @Unsecured
-//    @GetMapping("/get-users")
-//    public ResponseEntity<PaginatedResponse<List<UserDto>>> getUsers(
-//        @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size,
-//         @RequestParam(required = false) String firstName, @RequestParam(required = false) String lastName,
-//         @RequestParam(required = false) String email, @RequestParam(required = false) Long roleId) {
-//            return ResponseEntity.ok(userService.fetchAllUsersBy(page, size, firstName, lastName, email, roleId));
-//
-//    }
-
     @PreAuthorize("hasAuthority('TOGGLE_ENABLE_USER')")
     @PostMapping("/toggle-enable-user")
     public ResponseEntity<BaseResponse<Response>> adminEnableUser(@RequestParam String phone) {

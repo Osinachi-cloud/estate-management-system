@@ -16,7 +16,7 @@ public class CustomerDto implements Serializable {
 
     private static final long serialVersionUID = 2345L;
 
-//    private String userId;
+    private String userId;
     private String tier;
     private String country;
     private String password;
@@ -38,8 +38,8 @@ public class CustomerDto implements Serializable {
 //        this.userId = customer.getUserId();
         this.firstName = customer.getFirstName();
         this.lastName = customer.getLastName();
-        this.emailAddress = customer.getEmailAddress();
-        this.phoneNumber = customer.getPhoneNumber();
+        this.emailAddress = customer.getEmail();
+        this.phoneNumber = customer.getPhone();
 //        this.tier = customer.getTier().name();
         this.country = customer.getCountry();
         this.hasPin = customer.getPin() != null;

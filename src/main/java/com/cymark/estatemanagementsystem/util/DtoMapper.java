@@ -98,8 +98,8 @@ public class DtoMapper {
             UserDto userDto = new UserDto();
             userDto.setFirstName(userEntity.getFirstName());
             userDto.setLastName(userEntity.getLastName());
-            userDto.setEmailAddress(userEntity.getEmailAddress());
-            userDto.setPhoneNumber(userEntity.getPhoneNumber());
+            userDto.setEmailAddress(userEntity.getEmail());
+            userDto.setPhoneNumber(userEntity.getPhone());
             userDto.setRole(userEntity.getRole().getName());
             userDto.setProfileImage(userEntity.getProfileImage());
             userDto.setShortBio(userEntity.getShortBio());

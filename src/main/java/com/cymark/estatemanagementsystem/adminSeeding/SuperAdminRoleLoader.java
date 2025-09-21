@@ -1,33 +1,25 @@
 package com.cymark.estatemanagementsystem.adminSeeding;
 
+import com.cymark.estatemanagementsystem.exception.CymarkException;
 import com.cymark.estatemanagementsystem.model.entity.Permission;
 import com.cymark.estatemanagementsystem.model.entity.Role;
 import com.cymark.estatemanagementsystem.model.entity.UserEntity;
-import com.cymark.estatemanagementsystem.model.enums.Designation;
 import com.cymark.estatemanagementsystem.repository.PermissionRepository;
 import com.cymark.estatemanagementsystem.repository.RoleRepository;
 import com.cymark.estatemanagementsystem.repository.UserRepository;
-import com.cymark.estatemanagementsystem.service.PasswordService;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.stereotype.Component;
-import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
 
-import static com.cymark.estatemanagementsystem.util.DtoMapper.mapRoleToDto;
-
-@Component
-public class SuperAdminRoleLoader implements
-        ApplicationListener<ContextRefreshedEvent> {
-
+@Service
+public class SuperAdminRoleLoader {
     private final Logger log = LoggerFactory.getLogger(SuperAdminRoleLoader.class);
-
-    boolean alreadySetup = false;
 
     @Autowired
     private UserRepository adminRepository;
@@ -38,15 +30,8 @@ public class SuperAdminRoleLoader implements
     @Autowired
     private PermissionRepository permissionRepository;
 
-    @Autowired
-    private PasswordService passwordService;
-
-    @Override
     @Transactional
-    public void onApplicationEvent(ContextRefreshedEvent event) {
-
-        if (alreadySetup)
-            return;
+    public void addSuperAdminRole(UserEntity userEntity) {
 
         Permission createAdmin
                 = createPrivilegeIfNotFound("CREATE_ADMIN", "create admin", "admin");
@@ -144,7 +129,7 @@ public class SuperAdminRoleLoader implements
         Permission toggleEnableUser
                 = createPrivilegeIfNotFound("TOGGLE_ENABLE_USER", "Enable User", "user_management");
 
-        createRoleIfNotFound("SUPER_ADMIN", "All Permission", Arrays.asList(
+        createRoleIfNotFound("SUPER_ADMIN", "Overseas other admin within and estate", Arrays.asList(
                 createUser,
                 createAdmin,
                 createRole,
@@ -179,36 +164,23 @@ public class SuperAdminRoleLoader implements
                 toggleEnableUser
         ));
 
-
         Optional<Role> adminRole = roleRepository.findByName("SUPER_ADMIN");
-        Role adR = new Role();
-        if(adminRole.isPresent()){
-            adminRole.get().setName("SUPER_ADMIN");
-
-//       adminRole.setPermissions(List.of(readPrivilege, writePrivilege, deletePrivilege, createAdminPrivilege));
-            adR = roleRepository.save(adminRole.get());
-            log.info("adminRole : {}", mapRoleToDto(adR));
-        }
-
-        Optional<UserEntity> existingSuperAdmin = adminRepository.findByEmailAddress("admin@ems.com");
+        Optional<UserEntity> existingSuperAdmin = adminRepository.findByEmail(userEntity.getEmail());
 
         if(existingSuperAdmin.isEmpty()){
-            UserEntity admin = new UserEntity();
-            admin.setFirstName("Test");
-            admin.setLastName("Test");
-            admin.setPhoneNumber("+23409876542");
-            admin.setPassword(passwordService.encode("AB$12345"));
-            admin.setEmailAddress("admin@ems.com");
-            admin.setDesignation(Designation.EXTERNAL);
-//            admin.setUsername("admin@ems.com");
-//            admin.setUserId(NumberUtils.generate(9));
-            admin.setRole(adR);
-
-            admin.setEnabled(true);
-            adminRepository.save(admin);
+            throw new CymarkException("This Super admin does not exists");
         }
 
-        alreadySetup = true;
+        if(adminRole.isEmpty()){
+            throw new CymarkException("This Super admin role does not exists");
+        }
+
+        UserEntity superAdmin = existingSuperAdmin.get();
+
+        superAdmin.setRole(adminRole.get());
+        superAdmin.setEnabled(true);
+        adminRepository.save(superAdmin);
+
     }
 
     @Transactional
@@ -238,8 +210,5 @@ public class SuperAdminRoleLoader implements
             log.info("permissionList : {}", permissionList);
             return roleRepository.save(role);
         }
-
     }
 }
-
-
