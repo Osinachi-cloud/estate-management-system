@@ -57,10 +57,15 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth->{
+
+                    // Swagger/OpenAPI endpoints (updated for OpenAPI 3)
+                    auth.requestMatchers("/webjars/**", "/swagger-ui/**", "/swagger-ui.html",
+                            "/swagger-resources/**", "/v3/api-docs/**", "/v2/**").permitAll();
                     auth
                             .requestMatchers(ALLOWED_URLS)
                             .permitAll()
                             .anyRequest().authenticated();
+
                 })
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler())
