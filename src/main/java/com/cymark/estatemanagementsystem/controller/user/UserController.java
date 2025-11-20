@@ -4,6 +4,7 @@ import com.cymark.estatemanagementsystem.model.dto.*;
 import com.cymark.estatemanagementsystem.model.dto.request.CustomerUpdateRequest;
 import com.cymark.estatemanagementsystem.model.dto.request.EmailVerificationRequest;
 import com.cymark.estatemanagementsystem.model.dto.response.VerificationResponse;
+import com.cymark.estatemanagementsystem.model.entity.User;
 import com.cymark.estatemanagementsystem.model.request.ContactVerificationRequest;
 import com.cymark.estatemanagementsystem.model.response.BaseResponse;
 import com.cymark.estatemanagementsystem.model.response.PaginatedResponse;
@@ -55,16 +56,17 @@ public class UserController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
-            @RequestParam(required = false) Long roleId) {
+            @RequestParam(required = false) Long roleId,
+            @RequestParam(required = false) Boolean isActive) {
 
-        PaginatedResponse<List<UserDto>> users = userService.fetchAllUsersBy(page, size, firstName, lastName, email, roleId);
+        PaginatedResponse<List<UserDto>> users = userService.fetchAllUsersBy(page, size, firstName, lastName, email, roleId, isActive);
         return ResponseEntity.ok(BaseResponse.success(users, "Users retrieved successfully"));
     }
 
-    @PutMapping("/update-customer")
+    @PutMapping("/update-user")
     public ResponseEntity<BaseResponse<CustomerDto>> updateCustomer(
             @RequestBody @Valid CustomerUpdateRequest customerRequest,
-            @RequestParam("email") @NotBlank String emailAddress) {
+            @RequestParam(value = "email") String emailAddress) {
 
         CustomerDto customer = userService.updateCustomer(customerRequest, emailAddress);
         return ResponseEntity.ok(BaseResponse.success(customer, "Customer updated successfully"));
@@ -85,13 +87,23 @@ public class UserController {
         return ResponseEntity.ok(BaseResponse.success(customer, "Customer retrieved successfully"));
     }
 
-    @GetMapping("/customer-details")
+    @GetMapping("/customer-detail")
     public ResponseEntity<BaseResponse<CustomerDto>> getCustomerByEmailAddress(
             @RequestParam("email") @NotBlank @Email String emailAddress) {
 
         CustomerDto customer = userService.getCustomerByEmail(emailAddress);
         return ResponseEntity.ok(BaseResponse.success(customer, "Customer retrieved successfully"));
     }
+
+    @GetMapping("/customer-details")
+    public ResponseEntity<BaseResponse<UserDto>> getAllCustomerDetailsByEmail(
+            @RequestParam("email") String emailAddress) {
+
+        UserDto user = userService.getAllCustomerDetailsByEmail(emailAddress);
+        return ResponseEntity.ok(BaseResponse.success(user, "Customer retrieved successfully"));
+    }
+
+
 
     @Unsecured
     @PostMapping("/verify-email")
@@ -111,6 +123,9 @@ public class UserController {
         VerificationResponse response = verificationService.verifyEmailAddress(verificationRequest);
         return ResponseEntity.ok(BaseResponse.success(response, "Email verified successfully"));
     }
+
+
+
 
 //    @PostMapping(value = "allowSaveCard")
 //    public Response allowSaveCard(@RequestParam("savedCard") Boolean savedCard) {

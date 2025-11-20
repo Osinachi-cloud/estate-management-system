@@ -43,6 +43,11 @@ public final class UserSpecification {
                 roleId != null ? builder.equal(root.get("role").get("id"), roleId) : null;
     }
 
+    public static Specification<UserEntity> enableEqual(Boolean enabled) {
+        return (root, query, builder) ->
+                enabled != null ? builder.equal(root.get("enabled"), enabled) : null;
+    }
+
     public static Specification<UserEntity> emailEqual(String emailAddress) {
         return (root, query, builder) ->
                 emailAddress != null ? builder.equal(root.get("emailAddress"), emailAddress) : null;

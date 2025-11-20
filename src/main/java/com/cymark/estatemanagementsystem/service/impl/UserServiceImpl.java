@@ -9,6 +9,7 @@ import com.cymark.estatemanagementsystem.model.entity.ContactVerification;
 import com.cymark.estatemanagementsystem.model.entity.Estate;
 import com.cymark.estatemanagementsystem.model.entity.Role;
 import com.cymark.estatemanagementsystem.model.entity.UserEntity;
+import com.cymark.estatemanagementsystem.model.enums.Designation;
 import com.cymark.estatemanagementsystem.model.enums.ResponseStatus;
 import com.cymark.estatemanagementsystem.model.request.AdminCustomerRequest;
 import com.cymark.estatemanagementsystem.model.response.PaginatedResponse;
@@ -24,7 +25,6 @@ import com.cymark.estatemanagementsystem.util.NumberUtils;
 import com.cymark.estatemanagementsystem.util.ResponseUtils;
 import com.cymark.estatemanagementsystem.util.UserValidationUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +36,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +45,10 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+import static com.cymark.estatemanagementsystem.util.DtoMapper.convertRoleToDto;
 import static com.cymark.estatemanagementsystem.util.DtoMapper.convertUserListToDto;
 
 
@@ -70,17 +73,21 @@ public class UserServiceImpl implements UserService {
         try {
 
             validate(customerRequest);
+            assignDesignation(customerRequest);
 
             UserEntity customer = new UserEntity();
             customer.setFirstName(customerRequest.getFirstName());
             customer.setLastName(customerRequest.getLastName());
-            customer.setEmail(customerRequest.getEmailAddress());
+            customer.setEmail(customerRequest.getEmail());
             customer.setPhone(customerRequest.getPhoneNumber());
+            System.out.println("==========================");
             customer.setOccupancyVerified(false);
             customer.setEnabled(false);
             customer.setDesignation(customerRequest.getDesignation());
             customer.setEstateId(customerRequest.getEstateId());
             customer.setUserId(customerRequest.getPhoneNumber() + customerRequest.getEstateId());
+            customer.setLandlordId(customerRequest.getLandlordId());
+            customer.setTenantId(customerRequest.getTenantId());
 
 //            customer.setShortBio(getStr(customerRequest.getShortBio()));
 
@@ -129,6 +136,7 @@ public class UserServiceImpl implements UserService {
         try {
 
             validatesByAdmin(customerRequest);
+
 
             UserEntity customer = new UserEntity();
             customer.setFirstName(customerRequest.getFirstName());
@@ -229,7 +237,8 @@ public class UserServiceImpl implements UserService {
 
     private void validate(CustomerRequest customerRequest) {
         log.info("customerRequest 2===>: {}", customerRequest);
-        if (!UserValidationUtils.isValidEmail(customerRequest.getEmailAddress())) {
+
+        if (!UserValidationUtils.isValidEmail(customerRequest.getEmail())) {
             throw new UserException(ResponseStatus.INVALID_EMAIL_ADDRESS);
         }
 
@@ -237,27 +246,86 @@ public class UserServiceImpl implements UserService {
             throw new UserException(ResponseStatus.INVALID_PHONE_NUMBER);
         }
 
-        Optional<UserEntity> existingCustomer = userRepository.findByEmail(customerRequest.getEmailAddress());
+        if(Objects.isNull( customerRequest.getDesignation()) || customerRequest.getDesignation().toString().isEmpty()){
+            throw new UserException("User designation can not be empty");
+        }
+
+        Optional<UserEntity> existingCustomer = userRepository.findByEmail(customerRequest.getEmail());
 
         Optional<UserEntity> existingCustomerByPhone = userRepository.findByPhone(customerRequest.getPhoneNumber());
 
         Optional<Estate> optionalEstate = estateRepository.findByEstateId(customerRequest.getEstateId());
 
         if (existingCustomer.isPresent()) {
-            log.info("customer exists with email ===>>> :{}", existingCustomer.get().getEmail());
+            log.info("customer exists with email  ===>>> :{}", existingCustomer.get().getEmail());
             throw new UserException(ResponseStatus.EMAIL_ADDRESS_EXISTS);
         }
 
         if (existingCustomerByPhone.isPresent()) {
-            log.info("customer exists with phone ===>>> :{}", existingCustomerByPhone.get().getPhone());
-            throw new UserException(ResponseStatus.PHONE_NUMBER_EXISTS + customerRequest.getPhoneNumber());
+            log.info("customer exists with phone  ===>>> :{}", existingCustomerByPhone.get().getPhone());
+            throw new UserException(ResponseStatus.PHONE_NUMBER_EXISTS + " "  + customerRequest.getPhoneNumber());
         }
 
         if(optionalEstate.isEmpty()){
             throw new UserException(ResponseStatus.INVALID_REFERENCE_CODE);
         }
 
+        System.out.println("================");
         passwordService.validateNewPassword(customerRequest.getPassword());
+    }
+
+    public void assignDesignation(CustomerRequest customerRequest) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if(Objects.equals(username, "anonymousUser")){
+            throw new UserException("User not logged in");
+        }
+        UserEntity loggedInUser = getUserByEmail(username);
+
+        System.out.println( "logged in "  + loggedInUser);
+
+        if(Objects.equals(customerRequest.getDesignation(), Designation.valueOf("TENANT"))) {
+            customerRequest.setLandlordId(loggedInUser.getUserId());
+        }
+
+        if(Objects.equals(customerRequest.getDesignation(), Designation.valueOf("OCCUPANT"))) {
+            customerRequest.setTenantId(loggedInUser.getUserId());
+        }
+    }
+
+//    public void assignDesignation(CustomerRequest customerRequest) {
+//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+//
+//        if(Objects.equals(username, "anonymousUser")){
+//            throw new UserException("User not logged in");
+//        }
+//        UserEntity loggedInUser = getUserByEmail(username);
+//
+//        System.out.println( "logged in "  + loggedInUser);
+//
+//        if(Objects.nonNull(loggedInUser.getRole().getName()) && hasUserCreationPermissions(loggedInUser)){
+//            customerRequest.setDesignation(LANDLORD);
+//        }
+//
+//        if(!Objects.equals(loggedInUser.getDesignation().toString(), LANDLORD.toString()) || !Objects.equals(loggedInUser.getDesignation().toString(),TENANT.toString())){
+//            throw new UserException("Only Landlords oR Tenants can add a user");
+//        }
+//
+//        if(loggedInUser.getDesignation().equals(LANDLORD)){
+//            customerRequest.setDesignation(TENANT);
+//            customerRequest.setLandlordId(loggedInUser.getUserId());
+//        } else if(loggedInUser.getDesignation().equals(TENANT)){
+//            customerRequest.setDesignation(OCCUPANT);
+//            customerRequest.setTenantId(loggedInUser.getUserId());
+//        }
+//    }
+
+    private boolean hasUserCreationPermissions(UserEntity loggedInUser) {
+        return loggedInUser.getRole().getPermissions().stream()
+                .filter(permission -> {
+                    log.info("permission : {}", permission);
+                    return permission.getName().equals("CREATE_USER");
+                }).isParallel();
     }
 
     private void validatesByAdmin(AdminCustomerRequest customerRequest) {
@@ -353,6 +421,35 @@ public class UserServiceImpl implements UserService {
         customerDto.setHasPin(customer.getPin() != null);
 
         return customerDto;
+    }
+
+    @Override
+    public UserDto getAllCustomerDetailsByEmail(String emailAddress) {
+        log.debug("Getting customer with email address: {}", emailAddress);
+        UserEntity customer = userRepository.findByEmail(emailAddress)
+                .orElseThrow(() -> new UserNotFoundException(String.format("Customer with this email [%s] not found", emailAddress)));
+
+        List<UserEntity> userEntityList = userRepository.findByLandlordOrTenantIdWhereBothArePresent(customer.getUserId(), customer.getEstateId());
+
+        log.info("userEntityList: {}", userEntityList);
+
+        UserDto userDto = new UserDto();
+        userDto.setUserId(customer.getUserId());
+        userDto.setFirstName(customer.getFirstName());
+        userDto.setLastName(customer.getLastName());
+        userDto.setRole(convertRoleToDto(customer.getRole()));
+        userDto.setEmail(customer.getEmail());
+        userDto.setPhoneNumber(customer.getPhone());
+        userDto.setEnabled(customer.isEnabled());
+        userDto.setProfileImage(customer.getProfileImage());
+        userDto.setProfileImage(customer.getProfileImage());
+        Optional<Estate> optionalEstate = estateRepository.findByEstateId(customer.getEstateId());
+        userDto.setEstate(optionalEstate.map(Estate::getName).orElse(null));
+        userDto.setLandlordId(customer.getLandlordId());
+        userDto.setTenantId(customer.getTenantId());
+        userDto.setSubUsersList(convertUserListToDto(userEntityList));
+
+        return userDto;
     }
 
     @Override
@@ -526,7 +623,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PaginatedResponse<List<UserDto>> fetchAllUsersBy(int page, int size, String firstName, String lastName, String email, Long roleId) {
+    public PaginatedResponse<List<UserDto>> fetchAllUsersBy(int page, int size, String firstName, String lastName, String email, Long roleId, Boolean isActive) {
 
         log.info("Request to fetch all users page: {}, size {}, firstName : {}, lastName : {}, email: {}, role Id : {} ", page,size,firstName,lastName, email,roleId);
         try {
@@ -534,11 +631,11 @@ public class UserServiceImpl implements UserService {
                             UserSpecification.firstNameEqual(firstName))
                     .and(UserSpecification.lastNameEqual(lastName))
                     .and(UserSpecification.roleIdEqual(roleId))
+                    .and(UserSpecification.enableEqual(isActive))
                     .and(UserSpecification.emailEqual(email));
 
             Page<UserEntity> users = userRepository.findAll(spec, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));
 
-            System.err.println("users "+users);
             PaginatedResponse<List<UserDto>> paginatedResponse = new PaginatedResponse<>();
             paginatedResponse.setPage(users.getNumber());
             paginatedResponse.setSize(users.getSize());
@@ -592,5 +689,15 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
 
         return ResponseUtils.createSuccessResponse(user.isEnabled() ? "successfully enabled" : "successfully disabled");
+    }
+
+    @Override
+    public UserEntity getUserByEmail(String email){
+        Optional<UserEntity> optionalUserEntity = userRepository.findByEmail(email);
+        if (optionalUserEntity.isEmpty()) {
+            throw new UserException(ResponseStatus.USER_NOT_FOUND);
+        }else {
+            return optionalUserEntity.get();
+        }
     }
 }

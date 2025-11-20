@@ -15,8 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-
-
 @Slf4j
 @Service("customUserDetailsService")
 public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
@@ -38,9 +36,9 @@ public class CustomUserDetailsServiceImpl implements CustomUserDetailsService {
 
         Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 
-        if(customerDto.getRole().getPermissionsDto() != null){
-            for(PermissionDto permissionDto: customerDto.getRole().getPermissionsDto()){
-                grantedAuthorities.add(new SimpleGrantedAuthority(permissionDto.getName()));
+        if(customerDto.getRole().getPermissionNames() != null){
+            for(String permissionDto: customerDto.getRole().getPermissionNames()){
+                grantedAuthorities.add(new SimpleGrantedAuthority(permissionDto));
             }
         }
 

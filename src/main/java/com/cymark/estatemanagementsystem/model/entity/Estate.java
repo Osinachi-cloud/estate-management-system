@@ -4,8 +4,10 @@ import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.envers.Audited;
 
+import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
+
 @Data
-@Audited
+@Audited(targetAuditMode = NOT_AUDITED)
 @Entity
 @Table(name = "estate")
 public class Estate extends BaseEntity {

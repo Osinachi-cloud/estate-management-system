@@ -3,9 +3,12 @@ package com.cymark.estatemanagementsystem.repository;
 import com.cymark.estatemanagementsystem.model.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.history.RevisionRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,4 +20,10 @@ public interface UserRepository extends RevisionRepository<UserEntity, Long, Int
     Optional<UserEntity> findByPhone(String phoneNumber);
 
     Optional<UserEntity> findByUserId(String customerId);
+
+    @Query("SELECT u FROM UserEntity u WHERE " +
+            "(u.landlordId = :userId OR u.tenantId = :userId) and u.estateId = :estateId")
+    List<UserEntity> findByLandlordOrTenantIdWhereBothArePresent(@Param("userId") String userId, @Param("estateId") String estateId);
+
+
 }

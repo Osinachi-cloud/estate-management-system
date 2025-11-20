@@ -55,6 +55,7 @@ public class SecurityConfig {
         System.out.println(" entered security config");
         return http
                 .csrf(AbstractHttpConfigurer::disable)
+//                .cors(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth->{
 
@@ -96,7 +97,6 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -104,6 +104,7 @@ public class SecurityConfig {
         configuration.setAllowedMethods(props.getAllowedMethods());
         configuration.setAllowedHeaders(props.getAllowedHeaders());
         configuration.setAllowCredentials(props.isAllowCORS());
+        log.info("CORS Configuration: {}", configuration);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

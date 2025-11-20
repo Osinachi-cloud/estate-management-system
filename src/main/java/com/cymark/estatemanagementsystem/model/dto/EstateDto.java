@@ -72,4 +72,23 @@ public class EstateDto {
             email = user.getEmail();
         }
     }
+    public EstateDto() {
+
+    }
+
+
+//    public EstateDto() {
+//        if (estate != null && user != null) {
+//            country = estate.getCountry();
+//            state = estate.getState();
+//            city = estate.getCity();
+//            name = estate.getName();
+//            postalCode = estate.getPostalCode();
+//            estateAdminUserId = user.getUserId();
+//            firstName = user.getFirstName();
+//            lastName = user.getLastName();
+//            phone = user.getPhone();
+//            email = user.getEmail();
+//        }
+//    }
 }

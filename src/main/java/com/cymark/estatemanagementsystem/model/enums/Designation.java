@@ -5,4 +5,5 @@ public enum Designation {
     TENANT,
     EXTERNAL,
     DEFAULT,
+    OCCUPANT
 }

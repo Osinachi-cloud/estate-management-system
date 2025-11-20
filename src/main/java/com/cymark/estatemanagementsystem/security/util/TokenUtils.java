@@ -27,8 +27,9 @@ public class TokenUtils {
                 .setSubject(user.getPhoneNumber());
         claims.put("email", String.valueOf(user.getEmailAddress()));
         claims.put("role", "ROLE_" + user.getRole().getName());
+        claims.put("permissions", user.getRole().getPermissionNames());
 
-        log.info("Inside generate token method 2");
+        log.info("Inside generate token method 2 {}", user.getRole().getPermissionNames());
 
         Date now = new Date();
         Date accessTokenExpiration = new Date(now.getTime() + props.getAccessTokenExpiryInMilliseconds());

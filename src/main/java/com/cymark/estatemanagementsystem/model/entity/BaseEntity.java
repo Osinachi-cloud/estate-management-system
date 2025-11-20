@@ -23,7 +23,7 @@ public abstract class BaseEntity {
 
     @Version
     @Column(name = "version")
-    private long version;
+    private Long version;
 
     @CreationTimestamp()
     @Column(name = "date_created")

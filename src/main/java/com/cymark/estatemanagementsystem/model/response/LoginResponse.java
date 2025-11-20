@@ -2,6 +2,7 @@ package com.cymark.estatemanagementsystem.model.response;
 
 import com.cymark.estatemanagementsystem.model.dto.CustomerDto;
 
+import com.cymark.estatemanagementsystem.model.dto.RoleDto;
 import com.cymark.estatemanagementsystem.security.model.Token;
 import lombok.Data;
 
@@ -17,7 +18,8 @@ public class LoginResponse {
     private String emailAddress;
     private String phoneNumber;
     private boolean hasPin;
-    private String role;
+//    private String role;
+    private RoleDto roleDto;
     private boolean saveCard;
     private boolean enablePush;
     private String accessToken;
@@ -35,7 +37,8 @@ public class LoginResponse {
         this.hasPin = customer.isHasPin();
         this.saveCard = customer.isSaveCard();
         this.enablePush = customer.isEnablePush();
-        this.role = customer.getRole().getName();
+//        this.role = customer.getRole().getName();
+        this.roleDto = customer.getRole();
         this.accessToken = token.getAccessToken();
         this.refreshToken = token.getRefreshToken();
         this.profileImage = customer.getProfileImage();

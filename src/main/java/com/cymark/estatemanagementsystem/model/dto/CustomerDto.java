@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import static com.cymark.estatemanagementsystem.util.DtoMapper.mapRoleToDto;
+import static com.cymark.estatemanagementsystem.util.DtoMapper.mapRoleToDtoWithoutPermissionDto;
 
 @Data
 @Builder
@@ -33,6 +34,10 @@ public class CustomerDto implements Serializable {
     private String roleName;
 //    private RoleDto adminRole;
     private String profileImage;
+    private String designation;
+    private String landlordId;
+    private String tenantId;
+    private String occupantId;
 
     public CustomerDto(UserEntity customer){
 //        this.userId = customer.getUserId();
@@ -46,8 +51,12 @@ public class CustomerDto implements Serializable {
         this.saveCard = customer.isSaveCard();
         this.enablePush = customer.isEnablePush();
         this.profileImage = customer.getProfileImage();
-        this.role = mapRoleToDto(customer.getRole());
+        this.role = mapRoleToDtoWithoutPermissionDto(customer.getRole());
         this.roleName = customer.getRole().getName();
+        this.tenantId = customer.getTenantId();
+        this.occupantId = customer.getOccupantId();
+        this.landlordId = customer.getLandlordId();
+        this.designation = customer.getDesignation().toString();
     }
 
 

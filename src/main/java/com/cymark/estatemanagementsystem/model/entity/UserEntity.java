@@ -51,6 +51,15 @@ public class UserEntity extends User {
     @Column(name = "enable_push")
     private boolean enablePush;
 
+    @Column(name = "land_lord_id")
+    private String landlordId;
+
+    @Column(name = "tenant_id")
+    private String tenantId;
+
+    @Column(name = "occupant_id")
+    private String occupantId;
+
     @Column(name = "is_occupancy_verified", nullable = false)
     private boolean isOccupancyVerified = false;
 

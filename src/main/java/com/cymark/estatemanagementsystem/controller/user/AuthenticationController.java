@@ -24,7 +24,8 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequestMapping(BASE_URL)
-//@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*")
+//@CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class AuthenticationController {
 

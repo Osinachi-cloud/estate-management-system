@@ -19,6 +19,7 @@ public class BaseResponse<T> {
     private HttpStatus status;
     private int statusCode;
     private String error;
+    private boolean success;
     private LocalDateTime timestamp;
     private T data;
 
@@ -36,6 +37,7 @@ public class BaseResponse<T> {
         return BaseResponse.<T>builder()
                 .data(data)
                 .message(message)
+                .success(true)
                 .status(HttpStatus.OK)
                 .statusCode(HttpStatus.OK.value())
                 .timestamp(LocalDateTime.now())
@@ -46,6 +48,7 @@ public class BaseResponse<T> {
     public static <T> BaseResponse<T> error(HttpStatus status, String error) {
         return BaseResponse.<T>builder()
                 .error(error)
+                .success(false)
                 .status(status)
                 .statusCode(status.value())
                 .timestamp(LocalDateTime.now())
@@ -56,6 +59,7 @@ public class BaseResponse<T> {
         return BaseResponse.<T>builder()
                 .error(errorResponse.getError())
                 .status(status)
+                .success(false)
                 .statusCode(status.value())
                 .timestamp(LocalDateTime.now())
                 .build();

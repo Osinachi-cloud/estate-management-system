@@ -14,7 +14,6 @@ public class TokenAuthenticationProvider {
     @Qualifier("customUserDetailsService")
     private final CustomUserDetailsServiceImpl customUserDetailsService;
 
-
     private final TokenUtils tokenUtils;
 
     public TokenAuthenticationProvider(@Qualifier("customUserDetailsService") CustomUserDetailsServiceImpl customUserDetailsService, TokenUtils tokenUtils) {

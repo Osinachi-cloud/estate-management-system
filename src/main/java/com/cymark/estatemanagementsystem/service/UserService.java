@@ -9,6 +9,8 @@ import com.cymark.estatemanagementsystem.model.entity.UserEntity;
 import com.cymark.estatemanagementsystem.model.request.AdminCustomerRequest;
 import com.cymark.estatemanagementsystem.model.response.PaginatedResponse;
 import com.cymark.estatemanagementsystem.model.response.Response;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -53,7 +55,11 @@ public interface UserService {
 
     Response allowSaveCard(String customerId, Boolean saveCard);
 
-    PaginatedResponse<List<UserDto>> fetchAllUsersBy(int page, int size, String firstName, String lastName, String email, Long roleId);
+    PaginatedResponse<List<UserDto>> fetchAllUsersBy(int page, int size, String firstName, String lastName, String email, Long roleId, Boolean isActive);
 
     Response toggleEnableUser(String phone);
+
+    UserEntity getUserByEmail(String email);
+
+    UserDto getAllCustomerDetailsByEmail(@NotBlank @Email String emailAddress);
 }

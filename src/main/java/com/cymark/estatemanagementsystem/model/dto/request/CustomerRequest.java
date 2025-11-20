@@ -22,7 +22,7 @@ public class CustomerRequest {
     @NotBlank(message = "Email address cannot be blank")
     @Pattern(regexp = "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\.[a-zA-Z0-9-]+)*$",
             message = "Invalid email format")
-    private String emailAddress;
+    private String email;
 
     @NotNull(message = "Phone number can not be null")
     @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$",
@@ -39,6 +39,10 @@ public class CustomerRequest {
     @NotBlank(message = "Password cannot be blank")
     @ValidPassword
     private String password;
+
+    private String landlordId;
+    private String tenantId;
+    private String occupantId;
 
 //    private String country;
 //    private DeviceDto device;
