@@ -19,7 +19,6 @@ public class OrderDto {
     private String clientSecret;
     private String paymentId;
     private String productCategoryName;
-    private String vendorEmailAddress;
     private PaymentMode paymentMode;
     private BigDecimal amount;
     private String customerId;
@@ -33,13 +32,12 @@ public class OrderDto {
     private String walletId;
     private String pin;
     private String psp;
-    private boolean saveBeneficiary;
     private Integer number;
     private String startTime;
     private String dateCreated;
     private String orderId;
-    private Long bodyMeasurementId;
     private BigDecimal quantity;
-    private String bodyMeasurementTag;
+    private String productName;
+
 }
 

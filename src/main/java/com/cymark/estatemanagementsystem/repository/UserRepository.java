@@ -25,5 +25,18 @@ public interface UserRepository extends RevisionRepository<UserEntity, Long, Int
             "(u.landlordId = :userId OR u.tenantId = :userId) and u.estateId = :estateId")
     List<UserEntity> findByLandlordOrTenantIdWhereBothArePresent(@Param("userId") String userId, @Param("estateId") String estateId);
 
+    @Query(value = "SELECT COUNT(*) FROM USER_ENTITY", nativeQuery = true)
+    Long countAllUsers(boolean enabled);
+
+    @Query(value = "SELECT COUNT(*) FROM USER_ENTITY WHERE IS_ENABLED = TRUE", nativeQuery = true)
+    Long countAllActiveUsers();
+
+    @Query(value = "SELECT COUNT(*) FROM USER_ENTITY WHERE IS_ENABLED = FALSE", nativeQuery = true)
+    Long countAllInActiveUsers();
+
+    @Query(value = "SELECT COUNT(*) FROM USER_ENTITY WHERE DESIGNATION = :designation", nativeQuery = true)
+    Long countAllUsersByDesignation(@Param("designation") String designation);
+
+
 
 }

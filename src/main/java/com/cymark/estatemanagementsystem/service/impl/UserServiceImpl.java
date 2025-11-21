@@ -700,4 +700,29 @@ public class UserServiceImpl implements UserService {
             return optionalUserEntity.get();
         }
     }
+
+    private Long getLandLordCount(){
+        return userRepository.countAllUsersByDesignation("LANDLORD");
+    }
+
+    private Long getTenantLordCount(){
+        return userRepository.countAllUsersByDesignation("TENANT");
+    }
+
+    private Long getOccupantLordCount(){
+        return userRepository.countAllUsersByDesignation("OCCUPANT");
+    }
+
+    @Override
+    public UserStatistics getUserStats(){
+        return UserStatistics
+                .builder()
+                .totalUsersCount(userRepository.count())
+                .activeUsersCount(userRepository.countAllActiveUsers())
+                .inactiveUsersCount(userRepository.countAllInActiveUsers())
+                .landLordUsersCount(getLandLordCount())
+                .occupantUsersCount(getOccupantLordCount())
+                .tenantUsersCount(getTenantLordCount())
+                .build();
+    }
 }

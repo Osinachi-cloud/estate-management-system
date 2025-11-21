@@ -29,6 +29,4 @@ public interface OrderService {
     OrderDto updateProductOrder(String orderId, String orderStatus);
 
     OrderStatistics getCustomerProductStat();
-
-    OrderStatistics getVendorProductStat();
 }

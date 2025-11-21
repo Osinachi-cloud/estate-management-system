@@ -63,6 +63,12 @@ public class UserController {
         return ResponseEntity.ok(BaseResponse.success(users, "Users retrieved successfully"));
     }
 
+    @GetMapping("/get-users-stats")
+    public ResponseEntity<BaseResponse<UserStatistics>> getUsers(){
+        UserStatistics usersStat = userService.getUserStats();
+        return ResponseEntity.ok(BaseResponse.success(usersStat, "Users retrieved successfully"));
+    }
+
     @PutMapping("/update-user")
     public ResponseEntity<BaseResponse<CustomerDto>> updateCustomer(
             @RequestBody @Valid CustomerUpdateRequest customerRequest,

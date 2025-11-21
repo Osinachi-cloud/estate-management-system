@@ -1,6 +1,7 @@
 package com.cymark.estatemanagementsystem.model.entity;
 
 import com.cymark.estatemanagementsystem.model.enums.Currency;
+import com.cymark.estatemanagementsystem.model.enums.Designation;
 import com.cymark.estatemanagementsystem.model.enums.OrderStatus;
 import com.cymark.estatemanagementsystem.model.enums.PaymentMode;
 import jakarta.persistence.*;
@@ -9,6 +10,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -29,14 +31,8 @@ public class Order extends BaseEntity {
     @Column(name = "product_id", nullable = false)
     private String productId;
 
-    @Column(name = "product_category_name")
-    private String productCategoryName;
-
-    @Column(name = "vendor_email_address")
-    private String vendorEmailAddress;
-
-    @Column(name = "product_package")
-    private String productPackage;
+    @Column(name = "product_name")
+    private String productName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "payment_mode")
@@ -53,25 +49,17 @@ public class Order extends BaseEntity {
     @Column(name = "status")
     private OrderStatus status;
 
-    @Column(name = "narration")
-    private String narration;
-
-    @Column(name = "description")
-    private String description;
-
     @Column(name = "quantity")
     private BigDecimal quantity;
 
-    @Column(name = "body_measurement_id")
-    private Long bodyMeasurementId;
+    @Column(name = "estateId")
+    private String estateId;
 
-    @Column(name = "sleeve_type")
-    private String sleeveType;
+    @Column(name = "designation")
+    @Enumerated(EnumType.STRING)
+    private Designation designation;
 
-    @Column(name = "color")
-    private String color;
-
-    @Column(name = "body_measurement_tag")
-    private String bodyMeasurementTag;
+    @Column(name ="subscribe_for")
+    private LocalDateTime subscribeFor;
 
 }

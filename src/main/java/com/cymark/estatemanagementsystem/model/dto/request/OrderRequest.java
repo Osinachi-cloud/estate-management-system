@@ -1,7 +1,9 @@
 package com.cymark.estatemanagementsystem.model.dto.request;
 
 import com.cymark.estatemanagementsystem.model.enums.Currency;
+import com.cymark.estatemanagementsystem.model.enums.Designation;
 import com.cymark.estatemanagementsystem.model.enums.PaymentMode;
+import jakarta.persistence.Column;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Data;
@@ -24,10 +26,6 @@ public class OrderRequest {
 
     private String productId;
 
-    private String productCategoryName;
-
-    private String vendorEmailAddress;
-
     @Enumerated(EnumType.STRING)
     private PaymentMode paymentMode;
 
@@ -36,12 +34,11 @@ public class OrderRequest {
 
     private String status;
 
-    private String narration;
+    private String estateId;
 
-    private String sleeveType;
+    private String designation;
 
-    private String color;
+    private String productName;
 
-    private String bodyMeasurementTag;
-
+    private String subscribeFor;
 }

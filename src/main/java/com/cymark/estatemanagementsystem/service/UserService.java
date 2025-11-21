@@ -62,4 +62,6 @@ public interface UserService {
     UserEntity getUserByEmail(String email);
 
     UserDto getAllCustomerDetailsByEmail(@NotBlank @Email String emailAddress);
+
+    UserStatistics getUserStats();
 }

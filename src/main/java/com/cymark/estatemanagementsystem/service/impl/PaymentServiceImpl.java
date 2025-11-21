@@ -1,20 +1,26 @@
 package com.cymark.estatemanagementsystem.service.impl;
 
 import com.cymark.estatemanagementsystem.exception.PaymentException;
+import com.cymark.estatemanagementsystem.model.dto.OrderDto;
 import com.cymark.estatemanagementsystem.model.dto.request.InitializeTransactionRequest;
+import com.cymark.estatemanagementsystem.model.dto.request.OrderRequest;
 import com.cymark.estatemanagementsystem.model.dto.response.InitializeTransactionResponse;
 import com.cymark.estatemanagementsystem.model.dto.response.PaymentVerificationResponse;
 import com.cymark.estatemanagementsystem.model.entity.Order;
+import com.cymark.estatemanagementsystem.model.entity.Product;
 import com.cymark.estatemanagementsystem.model.entity.Transaction;
 import com.cymark.estatemanagementsystem.model.entity.UserEntity;
 import com.cymark.estatemanagementsystem.model.enums.OrderStatus;
+import com.cymark.estatemanagementsystem.model.enums.PaymentMode;
 import com.cymark.estatemanagementsystem.model.enums.TransactionStatus;
 import com.cymark.estatemanagementsystem.repository.OrderRepository;
+import com.cymark.estatemanagementsystem.repository.ProductRepository;
 import com.cymark.estatemanagementsystem.repository.UserRepository;
 import com.cymark.estatemanagementsystem.service.OrderService;
 import com.cymark.estatemanagementsystem.service.PaymentService;
 import com.cymark.estatemanagementsystem.service.TransactionService;
 import com.cymark.estatemanagementsystem.util.EnvironmentProperties;
+import com.cymark.estatemanagementsystem.util.NumberUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.uuid.impl.TimeBasedGenerator;
 import com.google.gson.Gson;
@@ -30,6 +36,7 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -59,14 +66,16 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final UserRepository userRepository;
     private final EnvironmentProperties properties;
+    private final ProductRepository productRepository;
 
-    public PaymentServiceImpl(OrderService productOrderService, TransactionService transactionService, OrderService orderService, OrderRepository orderRepository, UserRepository userRepository, EnvironmentProperties properties) {
+    public PaymentServiceImpl(OrderService productOrderService, TransactionService transactionService, OrderService orderService, OrderRepository orderRepository, UserRepository userRepository, EnvironmentProperties properties, ProductRepository productRepository) {
         this.productOrderService = productOrderService;
         this.transactionService = transactionService;
         this.orderService = orderService;
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.properties = properties;
+        this.productRepository = productRepository;
     }
 
     private final static TimeBasedGenerator uuidGenerator = Generators.timeBasedGenerator();
@@ -80,38 +89,29 @@ public class PaymentServiceImpl implements PaymentService {
         String email = getLoggedInUser()
                 .orElseThrow(()-> new PaymentException("Failed to authenticate user", 403));
 
-       UserEntity customer = userRepository.findByEmail(email)
-               .orElseThrow(()-> new PaymentException("Customer with Id : " + email + " does not exist", 404));
+        Product productCart = productRepository.findById(Long.valueOf(request.getProductId())).orElseThrow(()-> new PaymentException("Product with Id : " + request.getProductId() + " does not exist", 404));
+        log.info(" productCarts ---->>>: {}", productCart);
 
+        String transactionId = request.getReference();
 
-//        List<ProductCart> productCart = productCartRepository.findProductCartByCustomer(customer);
-//        log.info(" productCarts ---->>>: {}", productCart);
-//
-//        String transactionId = request.getReference();
-//
-//        log.info(" transactionId ---->{}", transactionId);
-//
-//        for (ProductCart productItem : productCart) {
-//            ProductOrderRequest productOrderRequest = new ProductOrderRequest();
-//            productOrderRequest.setStatus(OrderStatus.PROCESSING.toString());
-//            productOrderRequest.setEmailAddress(email);
-//            productOrderRequest.setTransactionId(transactionId);
-//            productOrderRequest.setOrderId(NumberUtils.generate(10) + productItem.getProductId());
-//            productOrderRequest.setAmount(productItem.getAmountByQuantity());
-//            productOrderRequest.setProductId(productItem.getProductId());
-//            productOrderRequest.setProductCategoryName(productItem.getProductCategoryName());
-//            productOrderRequest.setPaymentMode(PaymentMode.CARD);
-//            productOrderRequest.setNarration(request.getNarration());
-//            productOrderRequest.setVendorEmailAddress(productItem.getVendor().getEmailAddress());
-//            productOrderRequest.setQuantity(BigDecimal.valueOf(productItem.getQuantity()));
-//            productOrderRequest.setColor(productItem.getColor());
-//            productOrderRequest.setSleeveType(productItem.getSleeveType());
-//            productOrderRequest.setBodyMeasurementTag(productItem.getMeasurementTag());
-//
-//            OrderDto productOrder = productOrderService.createProductOrder(productOrderRequest);
-//
-//            log.info("saved productOrder --->: {}", productOrder);
-//        }
+        log.info(" transactionId ----> {}", transactionId);
+
+        for(String subscribeFor: request.getSubcriptionFor()){
+            OrderRequest productOrderRequest = new OrderRequest();
+            productOrderRequest.setStatus(OrderStatus.PENDING.toString());
+            productOrderRequest.setEmailAddress(email);
+            productOrderRequest.setTransactionId(transactionId);
+            productOrderRequest.setOrderId(request.getProductId() + NumberUtils.generate(10));
+            productOrderRequest.setAmount(request.getAmount());
+            productOrderRequest.setProductId(productCart.getProductId());
+            productOrderRequest.setProductName(productCart.getName());
+            productOrderRequest.setPaymentMode(PaymentMode.CARD);
+            productOrderRequest.setEstateId(productCart.getEstate().getEstateId());
+            productOrderRequest.setDesignation(productCart.getDesignation().toString());
+            productOrderRequest.setSubscribeFor(subscribeFor);
+            OrderDto productOrder = productOrderService.createProductOrder(productOrderRequest);
+            log.info("saved productOrder --->: {}", productOrder);
+        }
     }
 
     @Override
@@ -200,6 +200,7 @@ public class PaymentServiceImpl implements PaymentService {
             HttpGet request = new HttpGet(properties.getPaystackVerificationUrl() + reference);
             request.addHeader("Content-type", "application/json");
             request.addHeader("Authorization", "Bearer " + properties.getPaystackSecretKey());
+            log.info("verification request ===>>: {}", request);
             return client.execute(request);
         }catch (Exception e){
             log.error("GET call to Pay-stack for verification failed : {}", e.getMessage());
@@ -227,6 +228,7 @@ public class PaymentServiceImpl implements PaymentService {
         try {
             HttpResponse response = callPayStackForVerification(reference);
 
+            log.info("payment verification response : {}", response);
             String payStackResponse = readFromResponse(response);
             ObjectMapper mapper = new ObjectMapper();
             System.out.println("payment verification result  " + payStackResponse);
@@ -247,7 +249,7 @@ public class PaymentServiceImpl implements PaymentService {
                 log.info("productOrder entity: {}", productOrders);
 
                 for (Order productOrder : productOrders) {
-                    productOrder.setStatus(OrderStatus.PAYMENT_COMPLETED.PAYMENT_COMPLETED);
+                    productOrder.setStatus(OrderStatus.PAYMENT_COMPLETED);
                     Order p = orderRepository.save(productOrder);
                     log.info("product order entity: {}", p);
                 }

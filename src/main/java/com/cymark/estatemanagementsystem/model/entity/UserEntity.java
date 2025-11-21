@@ -5,11 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.envers.Audited;
-
 import java.util.Collection;
-
 import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
-
 
 @Getter
 @Setter

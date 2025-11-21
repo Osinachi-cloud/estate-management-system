@@ -1,5 +1,6 @@
 package com.cymark.estatemanagementsystem.model.dto.response;
 
+import com.cymark.estatemanagementsystem.model.dto.VerificationData;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -20,29 +21,5 @@ public class InitializeTransactionResponse {
     private String message;
 
     @JsonProperty("data")
-    private Data data;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    @lombok.Data
-    public class Data {
-        /**
-         * this is the redirect url that the user would use to make the payment
-         */
-        @JsonProperty("authorization_url")
-        private String authorizationUrl;
-        /**
-         * this code identifies the payment url
-         */
-
-        @JsonProperty("access_code")
-        private String accessCode;
-        /**
-         * the unique reference used to identify this transaction
-         */
-        @JsonProperty("reference")
-        private String reference;
-
-    }
-
+    private VerificationData data;
 }

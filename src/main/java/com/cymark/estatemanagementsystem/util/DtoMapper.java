@@ -7,6 +7,7 @@ import com.cymark.estatemanagementsystem.model.enums.OrderStatus;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -195,8 +196,7 @@ public class DtoMapper {
         OrderDto productOrderDto = new OrderDto();
         productOrderDto.setStatus(productOrder.getStatus());
         productOrderDto.setReferenceNumber(productOrder.getOrderId());
-        productOrderDto.setProductCategoryName(productOrder.getProductCategoryName());
-        productOrderDto.setVendorEmailAddress(productOrder.getVendorEmailAddress());
+        productOrderDto.setProductName(productOrder.getProductName());
         productOrderDto.setOrderId(productOrder.getOrderId());
         productOrderDto.setCustomerId(productOrder.getEmailAddress());
         productOrderDto.setCurrency(productOrder.getCurrency());
@@ -205,9 +205,7 @@ public class DtoMapper {
         productOrderDto.setCustomerId(productOrder.getEmailAddress());
         productOrderDto.setDateCreated(formattedDate(productOrder.getDateCreated()));
         productOrderDto.setCurrency(productOrder.getCurrency());
-        productOrderDto.setBodyMeasurementId(productOrder.getBodyMeasurementId());
         productOrderDto.setQuantity(productOrder.getQuantity());
-        productOrderDto.setBodyMeasurementTag(productOrder.getBodyMeasurementTag());
 
         log.info("productOrderDto ----------======>: {}", productOrderDto);
         return productOrderDto;
@@ -230,22 +228,23 @@ public class DtoMapper {
         productOrder.setOrderId(productOrderRequest.getOrderId());
         productOrder.setEmailAddress(productOrderRequest.getEmailAddress());
         productOrder.setProductId(productOrderRequest.getProductId());
-        productOrder.setProductCategoryName(productOrderRequest.getProductCategoryName());
-        productOrder.setVendorEmailAddress(productOrderRequest.getVendorEmailAddress());
+        productOrder.setProductName(productOrderRequest.getProductName());
         productOrder.setPaymentMode(productOrderRequest.getPaymentMode());
         productOrder.setCurrency(productOrderRequest.getCurrency());
         productOrder.setAmount(productOrderRequest.getAmount());
         productOrder.setStatus(OrderStatus.valueOf(productOrderRequest.getStatus()));
         productOrder.setTransactionId(productOrderRequest.getTransactionId());
-        productOrder.setNarration(productOrderRequest.getNarration());
         productOrder.setQuantity(productOrderRequest.getQuantity());
         productOrder.setCurrency(productOrderRequest.getCurrency());
-        productOrder.setColor(productOrderRequest.getColor());
-        productOrder.setSleeveType(productOrderRequest.getSleeveType());
-        productOrder.setBodyMeasurementTag(productOrderRequest.getBodyMeasurementTag());
+        productOrder.setSubscribeFor(convertToLocalDate(productOrderRequest.getSubscribeFor()));
 
         log.info("productOrder : {}",productOrder);
         return productOrder;
     }
+
+    public static LocalDateTime convertToLocalDate(String isoString) {
+        return LocalDateTime.parse(isoString, DateTimeFormatter.ISO_DATE_TIME);
+    }
+
 
 }

@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface ProductRepository extends RevisionRepository<Product, Long, Integer>, JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
     Optional<Product> findByName(String id);
+
     Optional<Product> findByNameAndDesignation(String name, Designation designation);
 
 }

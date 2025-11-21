@@ -127,15 +127,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('CUSTOMER')")
     public OrderDto createProductOrder(OrderRequest orderDto) {
         log.info("create order request  : {}", orderDto);
         try {
-            orderDto.setStatus("PROCESSING");
-            orderDto.setOrderId(NumberUtils.generate(10));
-            log.info("productOrderDto 2: {}", orderDto);
             Order order = convertRequestToModel(orderDto);
-//            log.info("productOrder: {}", productOrder);
+            log.info("productOrder: {}", order);
             Order savedproductOrder = productOrderRepository.save(order);
             return convertProductOrderToDto(savedproductOrder);
         } catch (Exception e) {
@@ -187,31 +183,5 @@ public class OrderServiceImpl implements OrderService {
             throw new OrderException("Failed to get customer's order statistics", 417);
         }
 
-    }
-
-    @Override
-    public OrderStatistics getVendorProductStat() {
-        try {
-            String username = getLoggedInUser().orElseThrow(() -> new OrderException("Failed to authenticate user", 403));
-            List<Order> existingProductOrder = productOrderRepository.findProductOrderByVendorEmailAddress(username);
-            if (existingProductOrder.isEmpty()) {
-                throw new OrderException("No order found for logged in user", 404);
-            }
-            OrderStatistics productOrderStatistics = new OrderStatistics();
-            productOrderStatistics.setAllOrdersCount(productOrderRepository.countAllOrdersByVendorId(username));
-            productOrderStatistics.setCompletedOrdersCount(productOrderRepository.countCompletedOrdersByVendorId(username));
-            productOrderStatistics.setCancelledOrdersCount(productOrderRepository.countCancelledOrdersByVendorId(username));
-            productOrderStatistics.setProcessingOrdersCount(productOrderRepository.countProcessingOrdersByVendorId(username));
-            productOrderStatistics.setFailedOrdersCount(productOrderRepository.countFailedOrdersByVendorId(username));
-            productOrderStatistics.setInTransitOrdersCount(productOrderRepository.countInTransitOrdersByVendorId(username));
-            productOrderStatistics.setPaymentCompletedCount(productOrderRepository.countPaymentCompletedOrdersByVendorId(username));
-            return productOrderStatistics;
-        } catch (OrderException e) {
-            log.error("Custom Error occurred in Vendor Order stats : {}", e.getMessage());
-            throw new OrderException(e.getMessage(), e.getCode());
-        } catch (Exception e) {
-            log.error("An error occurred getting Vendor's order statistics : {}", e.getMessage());
-            throw new OrderException("Failed to get Vendor's order statistics", 417);
-        }
     }
 }

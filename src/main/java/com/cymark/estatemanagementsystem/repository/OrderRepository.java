@@ -52,13 +52,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findByEmailAddress(String emailAddress);
 
-    List<Order> findProductOrderByVendorEmailAddress(String emailAddress);
-
     Optional<Order> findByProductId(String productId);
 
-    Optional<Order> findByProductCategoryName(String productCategoryName);
-
-    Optional<Order> findByVendorEmailAddress(String productCategoryName);
+    Optional<Order> findByProductName(String productCategoryName);
 
     @Query("SELECT COUNT(p) FROM Order p WHERE p.emailAddress = :emailAddress")
     long countAllOrdersByCustomerId(@Param("emailAddress") String emailAddress);
@@ -80,26 +76,4 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT COUNT(p) FROM Order p WHERE p.emailAddress = :emailAddress AND p.status = 'PAYMENT_COMPLETED'")
     long countPaymentCompletedOrdersByCustomerId(@Param("emailAddress") String emailAddress);
 
-
-
-    @Query("SELECT COUNT(p) FROM Order p WHERE p.vendorEmailAddress = :emailAddress")
-    long countAllOrdersByVendorId(@Param("emailAddress") String emailAddress);
-
-    @Query("SELECT COUNT(p) FROM Order p WHERE p.vendorEmailAddress = :emailAddress AND p.status = 'FAILED'")
-    long countFailedOrdersByVendorId(@Param("emailAddress") String emailAddress);
-
-    @Query("SELECT COUNT(p) FROM Order p WHERE p.vendorEmailAddress = :emailAddress AND p.status = 'CANCELLED'")
-    long countCancelledOrdersByVendorId(@Param("emailAddress") String emailAddress);
-
-    @Query("SELECT COUNT(p) FROM Order p WHERE p.vendorEmailAddress = :emailAddress AND p.status = 'PROCESSING'")
-    long countProcessingOrdersByVendorId(@Param("emailAddress") String emailAddress);
-
-    @Query("SELECT COUNT(p) FROM Order p WHERE p.vendorEmailAddress = :emailAddress AND p.status = 'COMPLETED'")
-    long countCompletedOrdersByVendorId(@Param("emailAddress") String emailAddress);
-
-    @Query("SELECT COUNT(p) FROM Order p WHERE p.vendorEmailAddress = :emailAddress AND p.status = 'IN_TRANSIT'")
-    long countInTransitOrdersByVendorId(@Param("emailAddress") String emailAddress);
-
-    @Query("SELECT COUNT(p) FROM Order p WHERE p.vendorEmailAddress = :emailAddress AND p.status = 'PAYMENT_COMPLETED'")
-    long countPaymentCompletedOrdersByVendorId(@Param("emailAddress") String emailAddress);
 }
