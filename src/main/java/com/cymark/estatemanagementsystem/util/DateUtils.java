@@ -4,6 +4,7 @@ import com.cymark.estatemanagementsystem.model.dto.DateExtractDto;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Locale;
 
 public final class DateUtils {
@@ -72,5 +73,21 @@ public final class DateUtils {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ss mm HH " + dayOfMonth + " * ? *", Locale.ENGLISH);
         return dateTime.format(formatter);
+    }
+
+    public static LocalDate getDefaultFromDate() {
+        return LocalDate.now().with(TemporalAdjusters.firstDayOfYear());
+    }
+
+    public static LocalDate getDefaultToDate() {
+        return LocalDate.now().with(TemporalAdjusters.lastDayOfYear());
+    }
+
+    public static String getDefaultFromDateAsString() {
+        return getDefaultFromDate().toString();
+    }
+
+    public static String getDefaultToDateAsString() {
+        return getDefaultToDate().toString();
     }
 }

@@ -1,11 +1,14 @@
 package com.cymark.estatemanagementsystem.controller.transaction;
 
+import com.cymark.estatemanagementsystem.model.dto.EstateTransactionStatistics;
+import com.cymark.estatemanagementsystem.model.dto.UserTransactionStatistics;
 import com.cymark.estatemanagementsystem.model.entity.Transaction;
 import com.cymark.estatemanagementsystem.model.enums.TransactionStatus;
 import com.cymark.estatemanagementsystem.model.request.TransactionFilterRequest;
 import com.cymark.estatemanagementsystem.model.response.BaseResponse;
 import com.cymark.estatemanagementsystem.model.response.PaginatedResponse;
 import com.cymark.estatemanagementsystem.service.TransactionService;
+import com.cymark.estatemanagementsystem.util.DateUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -19,7 +22,6 @@ import static com.cymark.estatemanagementsystem.util.Constants.BASE_URL;
 
 @RestController
 @RequestMapping(BASE_URL)
-//@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 public class TransactionController {
 
@@ -124,5 +126,33 @@ public class TransactionController {
             return ResponseEntity.internalServerError()
                     .body(BaseResponse.error(HttpStatus.INTERNAL_SERVER_ERROR, "Error fetching transaction: " + e.getMessage()));
         }
+    }
+
+    @GetMapping("/get-user-transaction-stats")
+    public ResponseEntity<BaseResponse<UserTransactionStatistics>> getUserTransactionStats(
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String fromDate,
+            @RequestParam(required = false) String toDate
+    ){
+
+        String effectiveFromDate = fromDate != null ? fromDate : DateUtils.getDefaultFromDateAsString();
+        String effectiveToDate = toDate != null ? toDate : DateUtils.getDefaultToDateAsString();
+
+        UserTransactionStatistics userTransactionStatistics = transactionService.getUserTransactionStats(email,effectiveFromDate, effectiveToDate);
+        return ResponseEntity.ok(BaseResponse.success(userTransactionStatistics, "Users retrieved successfully"));
+    }
+
+
+    @GetMapping("/get-estate-transaction-stats")
+    public ResponseEntity<BaseResponse<EstateTransactionStatistics>> getEstateTransactionStats(
+            @RequestParam(required = false) String fromDate,
+            @RequestParam(required = false) String toDate
+    ){
+        String effectiveFromDate = fromDate != null ? fromDate : DateUtils.getDefaultFromDateAsString();
+        String effectiveToDate = toDate != null ? toDate : DateUtils.getDefaultToDateAsString();
+
+        EstateTransactionStatistics estateTransactionStatistics = transactionService.getEstateTransactionStats(
+                effectiveFromDate, effectiveToDate);
+        return ResponseEntity.ok(BaseResponse.success(estateTransactionStatistics, "Estate transaction stats retrieved successfully"));
     }
 }

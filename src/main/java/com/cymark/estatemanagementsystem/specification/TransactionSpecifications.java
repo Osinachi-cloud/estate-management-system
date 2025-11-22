@@ -6,6 +6,7 @@ import com.cymark.estatemanagementsystem.model.enums.TransactionStatus;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,5 +56,32 @@ public class TransactionSpecifications {
 
             return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
         };
+    }
+
+
+
+
+
+    public static Specification<Transaction> withStatus(TransactionStatus status) {
+        return (root, query, cb) -> status == null ? cb.conjunction() : cb.equal(root.get("status"), status);
+    }
+
+    public static Specification<Transaction> withCreatedAtBetween(LocalDate fromDate, LocalDate toDate) {
+        return (root, query, cb) -> {
+            if (fromDate == null && toDate == null) {
+                return cb.conjunction();
+            }
+            if (fromDate != null && toDate != null) {
+                return cb.between(root.get("createdAt"), fromDate.atStartOfDay(), toDate.atTime(23, 59, 59));
+            }
+            if (fromDate != null) {
+                return cb.greaterThanOrEqualTo(root.get("createdAt"), fromDate.atStartOfDay());
+            }
+            return cb.lessThanOrEqualTo(root.get("createdAt"), toDate.atTime(23, 59, 59));
+        };
+    }
+
+    public static Specification<Transaction> withCreatedAtNotNull() {
+        return (root, query, cb) -> cb.isNotNull(root.get("createdAt"));
     }
 }

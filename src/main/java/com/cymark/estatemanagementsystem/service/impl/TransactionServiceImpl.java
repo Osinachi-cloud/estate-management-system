@@ -1,11 +1,14 @@
 package com.cymark.estatemanagementsystem.service.impl;
 
+import com.cymark.estatemanagementsystem.model.dto.EstateTransactionStatistics;
+import com.cymark.estatemanagementsystem.model.dto.UserTransactionStatistics;
 import com.cymark.estatemanagementsystem.model.entity.Transaction;
+import com.cymark.estatemanagementsystem.model.enums.OrderStatus;
 import com.cymark.estatemanagementsystem.model.enums.TransactionStatus;
+import com.cymark.estatemanagementsystem.repository.OrderRepository;
 import com.cymark.estatemanagementsystem.repository.TransactionRepository;
 import com.cymark.estatemanagementsystem.service.TransactionService;
 import com.cymark.estatemanagementsystem.specification.TransactionSpecifications;
-import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -20,15 +23,17 @@ import org.springframework.data.domain.Sort;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
+
+import static com.cymark.estatemanagementsystem.model.enums.OrderStatus.FAILED;
+import static com.cymark.estatemanagementsystem.model.enums.OrderStatus.PAYMENT_COMPLETED;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
+    private final OrderRepository orderRepository;
 
 //    @Override
     public Page<Transaction> getTransactionsWithFilters1(
@@ -111,6 +116,44 @@ public class TransactionServiceImpl implements TransactionService {
     // Add this method to your TransactionRepository if you want to use it:
     // Page<Transaction> findByUserId(String userId, Pageable pageable);
     // Page<Transaction> findByStatus(TransactionStatus status, Pageable pageable);
+
+    public UserTransactionStatistics getUserTransactionStats(String email, String fromDate, String toDate){
+
+        java.time.LocalDate fromLocalDate = null;
+        java.time.LocalDate toLocalDate = null;
+
+        if (fromDate != null && !fromDate.isEmpty()) {
+            fromLocalDate = java.time.LocalDate.parse(fromDate);
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            toLocalDate = java.time.LocalDate.parse(toDate);
+        }
+        UserTransactionStatistics userTransactionStatistics = new UserTransactionStatistics();
+        userTransactionStatistics.setLastPaid(orderRepository.getLatestSubscriptionDateByStatus(email, OrderStatus.valueOf("COMPLETED")));
+        userTransactionStatistics.setTotalAmountPaid(orderRepository.sumTransactionAmountByUserIdBetween(OrderStatus.valueOf("COMPLETED"), email, fromLocalDate, toLocalDate));
+        return userTransactionStatistics;
+    }
+
+    public EstateTransactionStatistics getEstateTransactionStats(String fromDate, String toDate){
+        EstateTransactionStatistics estateTransactionStatistics = new EstateTransactionStatistics();
+
+        java.time.LocalDate fromLocalDate = null;
+        java.time.LocalDate toLocalDate = null;
+
+        if (fromDate != null && !fromDate.isEmpty()) {
+            fromLocalDate = java.time.LocalDate.parse(fromDate);
+        }
+        if (toDate != null && !toDate.isEmpty()) {
+            toLocalDate = java.time.LocalDate.parse(toDate);
+        }
+
+        estateTransactionStatistics.setTotalFailedTransactions(transactionRepository.countTransactionByStatusBetween(TransactionStatus.valueOf("FAILED"), fromLocalDate, toLocalDate));
+        estateTransactionStatistics.setTotalSuccessfulTransactions(transactionRepository.countTransactionByStatusBetween(TransactionStatus.valueOf("COMPLETED"), fromLocalDate, toLocalDate));
+        estateTransactionStatistics.setTotalSuccessfulAmountPaid(transactionRepository.sumTransactionAmountBetween(TransactionStatus.valueOf("COMPLETED"), fromLocalDate, toLocalDate));
+        estateTransactionStatistics.setTotalFailedAmountPaid(transactionRepository.sumTransactionAmountBetween(TransactionStatus.valueOf("FAILED"), fromLocalDate, toLocalDate));
+
+        return estateTransactionStatistics;
+    }
 }
 
 

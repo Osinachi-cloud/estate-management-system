@@ -37,6 +37,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -249,6 +250,12 @@ public class PaymentServiceImpl implements PaymentService {
                 transaction.setSubscribeTo(productOrders.getLast().getSubscribeFor());
                 transaction.setProductName(productOrders.getFirst().getProductName());
 
+                String description = productOrders.stream()
+                        .map(order -> order.getSubscribeFor().getMonth() + " " + order.getSubscribeFor().getYear())
+                        .collect(Collectors.joining(", "));
+
+                transaction.setDescription("Subscribed for " + description);
+                transaction.setStatus(TransactionStatus.COMPLETED);
                 Transaction savedTransaction = transactionService.saveTransaction(transaction);
 
                 log.info("transaction entity saved successfully : {}", savedTransaction);

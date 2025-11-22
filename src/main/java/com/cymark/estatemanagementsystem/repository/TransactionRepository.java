@@ -2,6 +2,8 @@ package com.cymark.estatemanagementsystem.repository;
 
 import com.cymark.estatemanagementsystem.model.entity.Transaction;
 import com.cymark.estatemanagementsystem.model.enums.TransactionStatus;
+import com.cymark.estatemanagementsystem.specification.TransactionSpecifications;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
@@ -13,6 +15,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -46,4 +50,23 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
             @Param("fromDate") LocalDateTime fromDate,
             @Param("toDate") LocalDateTime toDate,
             Pageable pageable);
+
+    default BigDecimal sumTransactionAmountBetween(TransactionStatus status, LocalDate fromDate, LocalDate toDate) {
+        Specification<Transaction> spec = Specification.where(TransactionSpecifications.withStatus(status))
+                .and(TransactionSpecifications.withCreatedAtNotNull())
+                .and(TransactionSpecifications.withCreatedAtBetween(fromDate, toDate));
+
+        List<Transaction> transactions = findAll(spec);
+        return transactions.stream()
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    default Long countTransactionByStatusBetween(TransactionStatus status, LocalDate fromDate, LocalDate toDate) {
+        Specification<Transaction> spec = Specification.where(TransactionSpecifications.withStatus(status))
+                .and(TransactionSpecifications.withCreatedAtNotNull())
+                .and(TransactionSpecifications.withCreatedAtBetween(fromDate, toDate));
+
+        return count(spec);
+    }
 }

@@ -1,5 +1,7 @@
 package com.cymark.estatemanagementsystem.service;
 
+import com.cymark.estatemanagementsystem.model.dto.EstateTransactionStatistics;
+import com.cymark.estatemanagementsystem.model.dto.UserTransactionStatistics;
 import com.cymark.estatemanagementsystem.model.entity.Transaction;
 import com.cymark.estatemanagementsystem.model.enums.TransactionStatus;
 import org.springframework.data.domain.Page;
@@ -21,4 +23,8 @@ public interface TransactionService {
     Optional<Transaction> getTransactionById(String transactionId);
 
     Transaction saveTransaction(Transaction transaction);
+
+    UserTransactionStatistics getUserTransactionStats(String email, String fromDate, String toDate);
+
+    EstateTransactionStatistics getEstateTransactionStats(String fromDate, String toDate);
 }
