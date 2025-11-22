@@ -54,11 +54,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PaginatedResponse<List<ProductDto>> fetchProductsBy(int page, int size, String name, String designation) {
+    public PaginatedResponse<List<ProductDto>> fetchProductsBy(int page, int size, String name, String designation, Boolean isPublished) {
         log.info("Request to fetch all estates page: {}, size {}, name : {}, designation : {} ", page,size,name,designation);
         try {
             Specification<Product> spec = Specification.where(
                             ProductSpecification.nameEqual(name))
+                    .and(ProductSpecification.publishedEquals(isPublished))
                     .and(ProductSpecification.designationEqual(designation));
 
             Page<Product> products = productRepository.findAll(spec, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));

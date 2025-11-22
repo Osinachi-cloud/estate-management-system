@@ -27,7 +27,10 @@ public final class ProductSpecification {
         };
     }
 
-
+    public static Specification<Product> publishedEquals(Boolean isPublished) {
+        return (root, query, builder) ->
+                isPublished != null ? builder.equal(root.get("publishStatus"), isPublished) : null;
+    }
 
     public static Specification<Product> nameEqual(String name) {
         return (root, query, builder) ->

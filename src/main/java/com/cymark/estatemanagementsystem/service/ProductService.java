@@ -8,5 +8,5 @@ import java.util.List;
 public interface ProductService {
     ProductDto createProduct(ProductDto productDto);
 
-    PaginatedResponse<List<ProductDto>> fetchProductsBy(int page, int size, String name, String designation);
+    PaginatedResponse<List<ProductDto>> fetchProductsBy(int page, int size, String name, String designation, Boolean isPublished);
 }

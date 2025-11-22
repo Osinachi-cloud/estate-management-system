@@ -46,6 +46,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 
 import com.fasterxml.uuid.Generators;
 
+import static com.cymark.estatemanagementsystem.util.DtoMapper.convertToLocalDate;
 import static com.cymark.estatemanagementsystem.util.SharedUtils.getLoggedInUser;
 
 
@@ -100,10 +101,11 @@ public class PaymentServiceImpl implements PaymentService {
             OrderRequest productOrderRequest = new OrderRequest();
             productOrderRequest.setStatus(OrderStatus.PENDING.toString());
             productOrderRequest.setEmailAddress(email);
+            productOrderRequest.setQuantity(1);
             productOrderRequest.setTransactionId(transactionId);
             productOrderRequest.setOrderId(request.getProductId() + NumberUtils.generate(10));
-            productOrderRequest.setAmount(request.getAmount());
-            productOrderRequest.setProductId(productCart.getProductId());
+            productOrderRequest.setAmount(request.getPrice());
+            productOrderRequest.setProductId(productCart.getId() + "");
             productOrderRequest.setProductName(productCart.getName());
             productOrderRequest.setPaymentMode(PaymentMode.CARD);
             productOrderRequest.setEstateId(productCart.getEstate().getEstateId());
@@ -115,7 +117,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public InitializeTransactionResponse initTransaction(InitializeTransactionRequest request) {
+    public InitializeTransactionResponse initTransaction(InitializeTransactionRequest request, Transaction transaction) {
 
         log.info("Payment initialization request : {}", request);
         try {
@@ -131,7 +133,7 @@ public class PaymentServiceImpl implements PaymentService {
             initializeOrder(request);
             if (initializeTransactionResponse.isStatus()) {
                 log.info("Transaction successfully completed : {}", initializeTransactionResponse);
-                paymentVerification(initializeTransactionResponse.getData().getReference());
+                paymentVerification(initializeTransactionResponse.getData().getReference(), transaction);
             }
             return initializeTransactionResponse;
         } catch (UnsupportedEncodingException e) {
@@ -215,14 +217,14 @@ public class PaymentServiceImpl implements PaymentService {
         request.setEmail(email);
         request.setReference(generateUuid());
         request.setChannel(request.getChannel());
-        request.setTransaction_charge(2);
+//        request.setTransaction_charge(2);
         request.setCallback_url(properties.getCallBackURL());
         request.setAmount(request.getAmount().multiply(BigDecimal.valueOf(100)));
         return new StringEntity(gson.toJson(request));
     }
 
     @Override
-    public PaymentVerificationResponse paymentVerification(String reference) {
+    public PaymentVerificationResponse paymentVerification(String reference, Transaction transaction) {
         PaymentVerificationResponse paymentVerificationResponse;
 
         try {
@@ -238,15 +240,18 @@ public class PaymentServiceImpl implements PaymentService {
                 throw new PaymentException("pay stack payment verification status is false", 417);
             } else if (paymentVerificationResponse.getMessage().equals("Verification successful")) {
 
-                Transaction transaction = initializeTransaction(paymentVerificationResponse);
+                 transaction = initializeTransaction(paymentVerificationResponse, transaction);
+
+                List<Order> productOrders = orderService.getOrdersByTransactionId(transaction.getTransactionId());
+
+                log.info("productOrder entity: {}", productOrders);
+                transaction.setSubscribeFrom(productOrders.getFirst().getSubscribeFor());
+                transaction.setSubscribeTo(productOrders.getLast().getSubscribeFor());
+                transaction.setProductName(productOrders.getFirst().getProductName());
 
                 Transaction savedTransaction = transactionService.saveTransaction(transaction);
 
                 log.info("transaction entity saved successfully : {}", savedTransaction);
-
-                List<Order> productOrders = orderService.getOrdersByTransactionId(savedTransaction.getTransactionId());
-
-                log.info("productOrder entity: {}", productOrders);
 
                 for (Order productOrder : productOrders) {
                     productOrder.setStatus(OrderStatus.PAYMENT_COMPLETED);
@@ -263,22 +268,22 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentVerificationResponse;
     }
 
-    private Transaction initializeTransaction(PaymentVerificationResponse paymentVerificationResponse) {
+    private Transaction initializeTransaction(PaymentVerificationResponse paymentVerificationResponse,  Transaction transaction) {
         if (Objects.isNull(paymentVerificationResponse) || Objects.isNull(paymentVerificationResponse.getData())) {
             throw new PaymentException("Failed to get transaction details from Paystack ", 417);
         }
-        Transaction transaction = Transaction.builder()
-                .userId(paymentVerificationResponse.getData().getCustomer().getEmail())
-                .transactionId(paymentVerificationResponse.getData().getReference())
-                .reference(paymentVerificationResponse.getData().getReference())
-                .amount(paymentVerificationResponse.getData().getAmount().divide(BigDecimal.valueOf(100)))
-                .gatewayResponse(paymentVerificationResponse.getData().getGatewayResponse())
-                .paidAt(paymentVerificationResponse.getData().getPaidAt())
-                .createdAt(paymentVerificationResponse.getData().getCreatedAt())
-                .channel(paymentVerificationResponse.getData().getChannel())
-                .currency(paymentVerificationResponse.getData().getCurrency())
-                .ipAddress(paymentVerificationResponse.getData().getIpAddress())
-                .build();
+
+                transaction.setUserId(paymentVerificationResponse.getData().getCustomer().getEmail());
+        transaction.setTransactionId(paymentVerificationResponse.getData().getReference());
+        transaction.setReference(paymentVerificationResponse.getData().getReference());
+        transaction.setAmount(paymentVerificationResponse.getData().getAmount().divide(BigDecimal.valueOf(100)));
+        transaction.setGatewayResponse(paymentVerificationResponse.getData().getGatewayResponse());
+        transaction.setPaidAt(convertToLocalDate(paymentVerificationResponse.getData().getCreatedAt()));
+        transaction.setCreatedAt(convertToLocalDate(paymentVerificationResponse.getData().getCreatedAt()));
+        transaction.setChannel(paymentVerificationResponse.getData().getChannel());
+        transaction.setCurrency(paymentVerificationResponse.getData().getCurrency());
+        transaction.setIpAddress(paymentVerificationResponse.getData().getIpAddress());
+        transaction.setFee(paymentVerificationResponse.getData().getAmount().divide(BigDecimal.valueOf(100)));
 
         if (paymentVerificationResponse.getData().getStatus().equals("abandoned")) {
             System.out.println("ABANDONED HERE");

@@ -3,6 +3,7 @@ package com.cymark.estatemanagementsystem.model.dto;
 import com.cymark.estatemanagementsystem.model.entity.Estate;
 import com.cymark.estatemanagementsystem.model.entity.Product;
 import com.cymark.estatemanagementsystem.model.enums.Designation;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 import java.math.BigDecimal;
@@ -16,8 +17,11 @@ public class ProductDto {
     private String productImage;
     @Min(value = 0, message = "Value cannot be negative")
     private BigDecimal price;
-    private Estate estate;
     private String designation;
+    private Boolean publishStatus;
+    private BigDecimal transactionCharge;
+    private Estate estate;
+
 
     public ProductDto() {}
 
@@ -30,5 +34,7 @@ public class ProductDto {
         price = product.getPrice();
         estate = product.getEstate();
         designation = product.getDesignation().toString();
+        publishStatus = product.getPublishStatus();
+        transactionCharge = product.getTransactionCharge();
     }
 }

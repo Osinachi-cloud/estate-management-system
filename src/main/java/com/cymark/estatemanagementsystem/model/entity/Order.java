@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Setter
 @ToString
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 public class Order extends BaseEntity {
 
     @Column(name = "order_id", unique = true, nullable = false)
@@ -50,7 +50,7 @@ public class Order extends BaseEntity {
     private OrderStatus status;
 
     @Column(name = "quantity")
-    private BigDecimal quantity;
+    private int quantity;
 
     @Column(name = "estateId")
     private String estateId;

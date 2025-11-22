@@ -36,7 +36,7 @@ public class OrderDto {
     private String startTime;
     private String dateCreated;
     private String orderId;
-    private BigDecimal quantity;
+    private int quantity;
     private String productName;
 
 }

@@ -42,7 +42,19 @@ public class ProductController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String designation) {
 
-        PaginatedResponse<List<ProductDto>> products = productService.fetchProductsBy(page, size, name, designation);
+        PaginatedResponse<List<ProductDto>> products = productService.fetchProductsBy(page, size, name, designation, null);
+        return ResponseEntity.ok(BaseResponse.success(products, "Products retrieved successfully"));
+    }
+
+    @Unsecured
+    @GetMapping("/get-products-published")
+    public ResponseEntity<BaseResponse<PaginatedResponse<List<ProductDto>>>> getPublishedProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String designation) {
+
+        PaginatedResponse<List<ProductDto>> products = productService.fetchProductsBy(page, size, name, designation, true);
         return ResponseEntity.ok(BaseResponse.success(products, "Products retrieved successfully"));
     }
 }

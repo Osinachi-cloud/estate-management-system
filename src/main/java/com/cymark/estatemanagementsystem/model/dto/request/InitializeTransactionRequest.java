@@ -30,8 +30,9 @@ public class InitializeTransactionRequest {
     /**
      * Extra information to be saved with this transaction
      */
-    private Integer transaction_charge;
+    private BigDecimal transaction_charge;
     private List<String> channel;
     private String productId;
     private List<String> subcriptionFor;
+    private BigDecimal price;
 }

@@ -31,6 +31,8 @@ public class Mapper {
         destination.setCode(source.getCode());
         destination.setEstate(source.getEstate());
         destination.setProductImage(source.getProductImage());
+        destination.setPublishStatus(source.getPublishStatus());
+        destination.setTransactionCharge(source.getTransactionCharge());
         return destination;
     }
 

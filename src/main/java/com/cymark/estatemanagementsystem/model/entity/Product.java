@@ -44,8 +44,10 @@ public class Product extends BaseEntity {
     private Designation designation;
 
     @Column(name = "publish_status")
-    @Enumerated(EnumType.STRING)
-    private PublishStatus publishStatus;
+    private Boolean publishStatus;
+
+    @Column(name = "transaction_charge")
+    private BigDecimal transactionCharge;
 }
 
 

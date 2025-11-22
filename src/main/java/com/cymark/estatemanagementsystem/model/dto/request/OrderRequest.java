@@ -18,7 +18,7 @@ public class OrderRequest {
 
     private String transactionId;
 
-    private BigDecimal quantity;
+    private int quantity;
 
     private BigDecimal amount;
 

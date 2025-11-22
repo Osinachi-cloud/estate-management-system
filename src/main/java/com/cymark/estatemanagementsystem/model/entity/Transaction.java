@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -28,10 +29,10 @@ public class Transaction extends com.cymark.estatemanagementsystem.model.entity.
     private String gatewayResponse;
 
     @Column(name = "paid_at")
-    private String paidAt;
+    private LocalDateTime paidAt;
 
     @Column(name = "created_at")
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     @Column(name = "channel")
     private String channel;
@@ -45,17 +46,8 @@ public class Transaction extends com.cymark.estatemanagementsystem.model.entity.
     @Column(name = "transaction_id", unique = true, nullable = false)
     private String transactionId;
 
-    @Column(name = "order_id")
-    private String orderId;
-
-    @Column(name = "wallet_transaction_id")
-    private String walletTransactionId;
-
     @Column(name = "user_id")
     private String userId;
-
-    @Column(name = "wallet_id")
-    private String walletId;
 
     @Column(name = "payment_card_id")
     private String paymentCardId;
@@ -70,8 +62,8 @@ public class Transaction extends com.cymark.estatemanagementsystem.model.entity.
     @Column(name = "fee")
     private BigDecimal fee;
 
-    @Column(name = "product_category")
-    private String productCategory;
+    @Column(name = "product_name")
+    private String productName;
 
     @Column(name = "narration")
     private String narration;
@@ -86,4 +78,22 @@ public class Transaction extends com.cymark.estatemanagementsystem.model.entity.
     @Column(name = "transaction_type")
     @Enumerated(EnumType.ORDINAL)
     private TransactionType transactionType;
+
+    @Column(name = "subscribe_start")
+    private LocalDateTime subscribeFrom;
+
+    @Column(name = "subscribe_end")
+    private LocalDateTime subscribeTo;
+
+    @Column(name = "transaction_charge")
+    private BigDecimal transactionCharge;
+
+    @Column(name = "total_transaction_charge")
+    private BigDecimal totalTransactionCharge;
+
+    @Column(name= "total_product_fee")
+    private BigDecimal totalProductFee;
+
+    @Column(name= "single_product_fee")
+    private BigDecimal singleProductFee;
 }

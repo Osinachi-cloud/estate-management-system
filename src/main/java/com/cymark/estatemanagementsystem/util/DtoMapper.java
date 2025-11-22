@@ -3,9 +3,11 @@ package com.cymark.estatemanagementsystem.util;
 import com.cymark.estatemanagementsystem.model.dto.*;
 import com.cymark.estatemanagementsystem.model.dto.request.OrderRequest;
 import com.cymark.estatemanagementsystem.model.entity.*;
+import com.cymark.estatemanagementsystem.model.enums.Designation;
 import com.cymark.estatemanagementsystem.model.enums.OrderStatus;
 import lombok.extern.slf4j.Slf4j;
 
+import javax.print.attribute.standard.Destination;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -237,6 +239,8 @@ public class DtoMapper {
         productOrder.setQuantity(productOrderRequest.getQuantity());
         productOrder.setCurrency(productOrderRequest.getCurrency());
         productOrder.setSubscribeFor(convertToLocalDate(productOrderRequest.getSubscribeFor()));
+        productOrder.setEstateId(productOrderRequest.getEstateId());
+        productOrder.setDesignation(Designation.valueOf(productOrderRequest.getDesignation()));
 
         log.info("productOrder : {}",productOrder);
         return productOrder;
