@@ -19,6 +19,7 @@ public class TransactionFilterRequest {
     private TransactionStatus status;
     private String productName;
     private String userId;
+    private String estateId;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
     private LocalDate fromDate;

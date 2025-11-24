@@ -249,6 +249,7 @@ public class PaymentServiceImpl implements PaymentService {
                 transaction.setSubscribeFrom(productOrders.getFirst().getSubscribeFor());
                 transaction.setSubscribeTo(productOrders.getLast().getSubscribeFor());
                 transaction.setProductName(productOrders.getFirst().getProductName());
+                transaction.setEstateId(productOrders.getFirst().getEstateId());
 
                 String description = productOrders.stream()
                         .map(order -> order.getSubscribeFor().getMonth() + " " + order.getSubscribeFor().getYear())

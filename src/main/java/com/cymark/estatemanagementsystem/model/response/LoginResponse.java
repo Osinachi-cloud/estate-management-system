@@ -26,6 +26,7 @@ public class LoginResponse {
     private String refreshToken;
     private String profileImage;
     private String designation;
+    private String estateId;
 
     public LoginResponse(CustomerDto customer, Token token) {
 //        this.customerId = customer.getUserId();
@@ -44,5 +45,6 @@ public class LoginResponse {
         this.refreshToken = token.getRefreshToken();
         this.designation = customer.getDesignation();
         this.profileImage = customer.getProfileImage();
+        this.estateId = customer.getEstateId();
     }
 }

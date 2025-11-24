@@ -1,6 +1,7 @@
 package com.cymark.estatemanagementsystem.specification;
 
 
+import com.cymark.estatemanagementsystem.model.entity.Order;
 import com.cymark.estatemanagementsystem.model.entity.Transaction;
 import com.cymark.estatemanagementsystem.model.enums.TransactionStatus;
 import jakarta.persistence.criteria.Predicate;
@@ -18,6 +19,7 @@ public class TransactionSpecifications {
             TransactionStatus status,
             String productName,
             String userId,
+            String estateId,
             LocalDateTime fromDate,
             LocalDateTime toDate) {
 
@@ -44,6 +46,10 @@ public class TransactionSpecifications {
 
             if (userId != null && !userId.isEmpty()) {
                 predicates.add(criteriaBuilder.equal(root.get("userId"), userId));
+            }
+
+            if (estateId != null && !estateId.isEmpty()) {
+                predicates.add(criteriaBuilder.equal(root.get("estateId"), estateId));
             }
 
             if (fromDate != null) {
@@ -83,5 +89,10 @@ public class TransactionSpecifications {
 
     public static Specification<Transaction> withCreatedAtNotNull() {
         return (root, query, cb) -> cb.isNotNull(root.get("createdAt"));
+    }
+
+    public static Specification<Transaction> withEstateId(String estateId) {
+        return (root, query, cb) ->
+                estateId == null || estateId.isEmpty() ? cb.conjunction() : cb.equal(root.get("estateId"), estateId);
     }
 }

@@ -109,8 +109,6 @@ public class UserController {
         return ResponseEntity.ok(BaseResponse.success(user, "Customer retrieved successfully"));
     }
 
-
-
     @Unsecured
     @PostMapping("/verify-email")
     public ResponseEntity<BaseResponse<VerificationResponse>> verifyEmail(

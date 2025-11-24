@@ -29,7 +29,7 @@ public class PermissionController {
         this.permissionService = permissionService;
     }
 
-    @PreAuthorize("hasAuthority('GET_ALL_PERMISSIONS')")
+//    @PreAuthorize("hasAuthority('GET_ALL_PERMISSIONS')")
     @GetMapping("/permissions")
     public ResponseEntity<BaseResponse<PaginatedResponse<List<PermissionDto>>>> getAllPermissions(
             @RequestParam Optional<Integer> page,
@@ -40,7 +40,7 @@ public class PermissionController {
         return ResponseEntity.ok(BaseResponse.success(permissions, "Permissions retrieved successfully"));
     }
 
-    @PreAuthorize("hasAuthority('GET_ALL_PERMISSIONS')")
+//    @PreAuthorize("hasAuthority('GET_ALL_PERMISSIONS')")
     @GetMapping("/get-permission-by-category")
     public ResponseEntity<BaseResponse<PaginatedResponse<List<PermissionByCategoryDto>>>> findAllPermissionByCategory(
             @RequestParam Optional<Integer> page,
@@ -51,7 +51,7 @@ public class PermissionController {
         return ResponseEntity.ok(BaseResponse.success(permissions, "Permissions by category retrieved successfully"));
     }
 
-    @PreAuthorize("hasAuthority('ASSIGN_PERMISSION')")
+//    @PreAuthorize("hasAuthority('ASSIGN_PERMISSION')")
     @PostMapping("/assign-permission")
     public ResponseEntity<BaseResponse<Response>> assignPermission(
             @RequestParam(value = "phoneNumber") @NotBlank String phone,

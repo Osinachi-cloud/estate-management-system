@@ -14,13 +14,10 @@ import com.cymark.estatemanagementsystem.model.enums.ResponseStatus;
 import com.cymark.estatemanagementsystem.model.request.AdminCustomerRequest;
 import com.cymark.estatemanagementsystem.model.response.PaginatedResponse;
 import com.cymark.estatemanagementsystem.model.response.Response;
-import com.cymark.estatemanagementsystem.repository.ContactVerificationRepository;
-import com.cymark.estatemanagementsystem.repository.EstateRepository;
-import com.cymark.estatemanagementsystem.repository.UserRepository;
-import com.cymark.estatemanagementsystem.service.PasswordService;
-import com.cymark.estatemanagementsystem.service.RoleService;
-import com.cymark.estatemanagementsystem.service.UserService;
+import com.cymark.estatemanagementsystem.repository.*;
+import com.cymark.estatemanagementsystem.service.*;
 import com.cymark.estatemanagementsystem.specification.UserSpecification;
+import com.cymark.estatemanagementsystem.util.DateUtils;
 import com.cymark.estatemanagementsystem.util.NumberUtils;
 import com.cymark.estatemanagementsystem.util.ResponseUtils;
 import com.cymark.estatemanagementsystem.util.UserValidationUtils;
@@ -42,6 +39,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.beans.PropertyDescriptor;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -62,6 +61,7 @@ public class UserServiceImpl implements UserService {
     private final ContactVerificationRepository verificationRepository;
     private final PasswordService passwordService;
     private final EstateRepository estateRepository;
+    private final TransactionService transactionService;
 
     private final RoleService roleService;
 
@@ -181,7 +181,9 @@ public class UserServiceImpl implements UserService {
             UserEntity customer = userRepository.findByEmail(emailAddress)
                     .orElseThrow(() -> new UserException(ResponseStatus.EMAIL_ADDRESS_NOT_FOUND));
             BeanUtils.copyProperties(customerRequest, customer, getNullPropertyNames(customerRequest));
-            UserEntity newCustomer = userRepository.saveAndFlush(customer);
+            Role role = roleService.findRoleByName(customerRequest.getRole()).orElseThrow(()-> new UserException("role not found"));
+            customer.setRole(role);
+            UserEntity newCustomer = userRepository.save(customer);
 
 //            log.info("Updated customer with ID: {}", newCustomer.getUserId());
             return new CustomerDto(newCustomer);
@@ -443,6 +445,10 @@ public class UserServiceImpl implements UserService {
         userDto.setEnabled(customer.isEnabled());
         userDto.setProfileImage(customer.getProfileImage());
         userDto.setProfileImage(customer.getProfileImage());
+        UserTransactionStatistics userStatistics = transactionService.getUserTransactionStats(customer.getEmail(),DateUtils.getDefaultFromDateAsString(),DateUtils.getDefaultToDateAsString());
+        userDto.setAmountPaid(userStatistics.getTotalAmountPaid());
+        LocalDateTime localDateTime = userStatistics.getLastPaid();
+        userDto.setLastPaid(localDateTime.getMonth() + ", " + localDateTime.getYear());
         Optional<Estate> optionalEstate = estateRepository.findByEstateId(customer.getEstateId());
         userDto.setEstate(optionalEstate.map(Estate::getName).orElse(null));
         userDto.setLandlordId(customer.getLandlordId());

@@ -38,6 +38,7 @@ public class CustomerDto implements Serializable {
     private String landlordId;
     private String tenantId;
     private String occupantId;
+    private String estateId;
 
     public CustomerDto(UserEntity customer){
 //        this.userId = customer.getUserId();
@@ -57,6 +58,7 @@ public class CustomerDto implements Serializable {
         this.occupantId = customer.getOccupantId();
         this.landlordId = customer.getLandlordId();
         this.designation = customer.getDesignation().toString();
+        this.estateId = customer.getEstateId();
     }
 
 

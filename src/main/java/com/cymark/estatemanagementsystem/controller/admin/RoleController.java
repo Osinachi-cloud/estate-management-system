@@ -36,7 +36,7 @@ public class RoleController {
     }
 
 
-    @PreAuthorize("hasAuthority('GET_ALL_ROLES')")
+//    @PreAuthorize("hasAuthority('GET_ALL_ROLES')")
     @GetMapping("/roles")
     public ResponseEntity<BaseResponse<PaginatedResponse<List<RoleDto>>>> getAllRoles(
             @RequestParam Optional<Integer> page,
@@ -47,7 +47,7 @@ public class RoleController {
         return ResponseEntity.ok(BaseResponse.success(roles, "Roles retrieved successfully"));
     }
 
-    @PreAuthorize("hasAuthority('ASSIGN_ROLE')")
+//    @PreAuthorize("hasAuthority('ASSIGN_ROLE')")
     @PostMapping("/assign-role")
     public ResponseEntity<BaseResponse<Response>> assignRole(
             @RequestParam @NotBlank String role,
@@ -64,7 +64,7 @@ public class RoleController {
         }
     }
 
-    @PreAuthorize("hasAuthority('CREATE_ROLE')")
+//    @PreAuthorize("hasAuthority('CREATE_ROLE')")
     @PostMapping("/create-role")
     public ResponseEntity<BaseResponse<RoleDto>> createRole(@RequestBody @Valid RoleDtoRequest roleRequest) {
 
@@ -79,11 +79,11 @@ public class RoleController {
         }
     }
 
-    @PreAuthorize("hasAuthority('UPDATE_ROLE_ADD_PERMISSION')")
-    @PatchMapping("/update-role-add-permission")
+//    @PreAuthorize("hasAuthority('UPDATE_ROLE_ADD_PERMISSION')")
+    @PutMapping("/update-role-add-permission")
     public ResponseEntity<BaseResponse<RoleDto>> updateRoleAddPermission(
             @RequestParam("role-name") @NotBlank String roleName,
-            @RequestBody @Valid RoleUpdateRequest roleRequest) {
+            @RequestBody RoleUpdateRequest roleRequest) {
 
         try {
             RoleDto updatedRole = roleService.updateRoleAddPermission(roleName, roleRequest);
@@ -96,7 +96,7 @@ public class RoleController {
         }
     }
 
-    @PreAuthorize("hasAuthority('DELETE_ROLE')")
+//    @PreAuthorize("hasAuthority('DELETE_ROLE')")
     @PostMapping("/delete-role")
     public ResponseEntity<BaseResponse<Response>> deleteRole(@RequestParam("name") @NotBlank String name) {
         Response response = roleService.deleteRole(name);

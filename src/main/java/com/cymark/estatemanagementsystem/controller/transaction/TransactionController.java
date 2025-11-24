@@ -33,6 +33,7 @@ public class TransactionController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String productName,
             @RequestParam(required = false) String userId,
+            @RequestParam(required = false) String estateId,
             @RequestParam(required = false) String fromDate,
             @RequestParam(required = false) String toDate,
             @RequestParam(defaultValue = "0") int page,
@@ -62,7 +63,7 @@ public class TransactionController {
             }
 
             Page<Transaction> transactions = transactionService.getTransactionsWithFilters(
-                    reference, statusEnum, productName, userId, fromLocalDate, toLocalDate, page, size);
+                    reference, statusEnum, productName, userId, estateId, fromLocalDate, toLocalDate, page, size);
 
             PaginatedResponse<List<Transaction>> pagination = new PaginatedResponse<List<Transaction>>(
                     page,
@@ -89,6 +90,7 @@ public class TransactionController {
                     filterRequest.getStatus(),
                     filterRequest.getProductName(),
                     filterRequest.getUserId(),
+                    filterRequest.getEstateId(),
                     filterRequest.getFromDate(),
                     filterRequest.getToDate(),
                     filterRequest.getPage(),
@@ -142,16 +144,16 @@ public class TransactionController {
         return ResponseEntity.ok(BaseResponse.success(userTransactionStatistics, "Users retrieved successfully"));
     }
 
-
     @GetMapping("/get-estate-transaction-stats")
     public ResponseEntity<BaseResponse<EstateTransactionStatistics>> getEstateTransactionStats(
+            @RequestParam(required = false) String estateId,
             @RequestParam(required = false) String fromDate,
             @RequestParam(required = false) String toDate
     ){
         String effectiveFromDate = fromDate != null ? fromDate : DateUtils.getDefaultFromDateAsString();
         String effectiveToDate = toDate != null ? toDate : DateUtils.getDefaultToDateAsString();
 
-        EstateTransactionStatistics estateTransactionStatistics = transactionService.getEstateTransactionStats(
+        EstateTransactionStatistics estateTransactionStatistics = transactionService.getEstateTransactionStats(estateId,
                 effectiveFromDate, effectiveToDate);
         return ResponseEntity.ok(BaseResponse.success(estateTransactionStatistics, "Estate transaction stats retrieved successfully"));
     }

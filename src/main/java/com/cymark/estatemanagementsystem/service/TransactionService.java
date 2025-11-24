@@ -15,6 +15,7 @@ public interface TransactionService {
             TransactionStatus status,
             String productName,
             String userId,
+            String estateId,
             LocalDate fromDate,
             LocalDate toDate,
             int page,
@@ -26,5 +27,5 @@ public interface TransactionService {
 
     UserTransactionStatistics getUserTransactionStats(String email, String fromDate, String toDate);
 
-    EstateTransactionStatistics getEstateTransactionStats(String fromDate, String toDate);
+    EstateTransactionStatistics getEstateTransactionStats(String estateId, String fromDate, String toDate);
 }

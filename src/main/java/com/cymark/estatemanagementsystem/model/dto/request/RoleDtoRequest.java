@@ -9,8 +9,6 @@ import java.util.List;
 public class RoleDtoRequest {
 
     private String name;
-
     private String description;
-
     private List<Long> ids;
 }

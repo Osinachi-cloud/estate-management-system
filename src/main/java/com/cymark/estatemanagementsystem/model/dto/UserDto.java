@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -26,6 +28,8 @@ public class UserDto {
     protected boolean enabled;
     protected Integer loginAttempts;
     protected String nationality;
+    private String lastPaid;
+    private BigDecimal amountPaid;
     protected RoleDto role;
     protected String profileImage;
     private String shortBio;

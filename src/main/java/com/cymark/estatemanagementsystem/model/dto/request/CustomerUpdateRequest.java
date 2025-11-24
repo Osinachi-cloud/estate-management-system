@@ -20,4 +20,6 @@ public class CustomerUpdateRequest {
     private String lastName;
 
     private boolean enabled;
+
+    private String role;
 }

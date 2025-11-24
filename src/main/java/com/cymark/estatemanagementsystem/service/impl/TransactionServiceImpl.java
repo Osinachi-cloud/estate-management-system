@@ -96,6 +96,7 @@ public class TransactionServiceImpl implements TransactionService {
             TransactionStatus status,
             String productName,
             String userId,
+            String estateId,
             LocalDate fromDate,
             LocalDate toDate,
             int page,
@@ -108,7 +109,7 @@ public class TransactionServiceImpl implements TransactionService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Specification<Transaction> spec = TransactionSpecifications.withFilters(
-                reference, status, productName, userId, fromDateTime, toDateTime);
+                reference, status, productName, userId, estateId, fromDateTime, toDateTime);
 
         return transactionRepository.findAll(spec, pageable);
     }
@@ -134,7 +135,7 @@ public class TransactionServiceImpl implements TransactionService {
         return userTransactionStatistics;
     }
 
-    public EstateTransactionStatistics getEstateTransactionStats(String fromDate, String toDate){
+    public EstateTransactionStatistics getEstateTransactionStats(String estateId, String fromDate, String toDate){
         EstateTransactionStatistics estateTransactionStatistics = new EstateTransactionStatistics();
 
         java.time.LocalDate fromLocalDate = null;
@@ -147,10 +148,10 @@ public class TransactionServiceImpl implements TransactionService {
             toLocalDate = java.time.LocalDate.parse(toDate);
         }
 
-        estateTransactionStatistics.setTotalFailedTransactions(transactionRepository.countTransactionByStatusBetween(TransactionStatus.valueOf("FAILED"), fromLocalDate, toLocalDate));
-        estateTransactionStatistics.setTotalSuccessfulTransactions(transactionRepository.countTransactionByStatusBetween(TransactionStatus.valueOf("COMPLETED"), fromLocalDate, toLocalDate));
-        estateTransactionStatistics.setTotalSuccessfulAmountPaid(transactionRepository.sumTransactionAmountBetween(TransactionStatus.valueOf("COMPLETED"), fromLocalDate, toLocalDate));
-        estateTransactionStatistics.setTotalFailedAmountPaid(transactionRepository.sumTransactionAmountBetween(TransactionStatus.valueOf("FAILED"), fromLocalDate, toLocalDate));
+        estateTransactionStatistics.setTotalFailedTransactions(transactionRepository.countTransactionByStatusBetween(TransactionStatus.valueOf("FAILED"),estateId, fromLocalDate, toLocalDate));
+        estateTransactionStatistics.setTotalSuccessfulTransactions(transactionRepository.countTransactionByStatusBetween(TransactionStatus.valueOf("COMPLETED"), estateId, fromLocalDate, toLocalDate));
+        estateTransactionStatistics.setTotalSuccessfulAmountPaid(transactionRepository.sumTransactionAmountBetween(TransactionStatus.valueOf("COMPLETED"), estateId, fromLocalDate, toLocalDate));
+        estateTransactionStatistics.setTotalFailedAmountPaid(transactionRepository.sumTransactionAmountBetween(TransactionStatus.valueOf("FAILED"), estateId, fromLocalDate, toLocalDate));
 
         return estateTransactionStatistics;
     }

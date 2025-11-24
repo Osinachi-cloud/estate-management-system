@@ -51,8 +51,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
             @Param("toDate") LocalDateTime toDate,
             Pageable pageable);
 
-    default BigDecimal sumTransactionAmountBetween(TransactionStatus status, LocalDate fromDate, LocalDate toDate) {
+    default BigDecimal sumTransactionAmountBetween(TransactionStatus status, String estateId, LocalDate fromDate, LocalDate toDate) {
         Specification<Transaction> spec = Specification.where(TransactionSpecifications.withStatus(status))
+                .and(TransactionSpecifications.withEstateId(estateId))
                 .and(TransactionSpecifications.withCreatedAtNotNull())
                 .and(TransactionSpecifications.withCreatedAtBetween(fromDate, toDate));
 
@@ -62,8 +63,9 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    default Long countTransactionByStatusBetween(TransactionStatus status, LocalDate fromDate, LocalDate toDate) {
+    default Long countTransactionByStatusBetween(TransactionStatus status, String estateId, LocalDate fromDate, LocalDate toDate) {
         Specification<Transaction> spec = Specification.where(TransactionSpecifications.withStatus(status))
+                .and(TransactionSpecifications.withEstateId(estateId))
                 .and(TransactionSpecifications.withCreatedAtNotNull())
                 .and(TransactionSpecifications.withCreatedAtBetween(fromDate, toDate));
 

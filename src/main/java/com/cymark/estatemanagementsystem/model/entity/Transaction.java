@@ -96,4 +96,7 @@ public class Transaction extends com.cymark.estatemanagementsystem.model.entity.
 
     @Column(name= "single_product_fee")
     private BigDecimal singleProductFee;
+
+    @Column(name = "estate_id")
+    private String estateId;
 }
