@@ -3,15 +3,19 @@ package com.cymark.estatemanagementsystem.service.impl;
 import com.cymark.estatemanagementsystem.exception.UserException;
 import com.cymark.estatemanagementsystem.model.dto.ProductDto;
 import com.cymark.estatemanagementsystem.model.entity.Estate;
+import com.cymark.estatemanagementsystem.model.entity.Order;
 import com.cymark.estatemanagementsystem.model.entity.Product;
 import com.cymark.estatemanagementsystem.model.entity.UserEntity;
 import com.cymark.estatemanagementsystem.model.enums.Designation;
+import com.cymark.estatemanagementsystem.model.enums.OrderStatus;
 import com.cymark.estatemanagementsystem.model.response.PaginatedResponse;
+import com.cymark.estatemanagementsystem.repository.OrderRepository;
 import com.cymark.estatemanagementsystem.repository.ProductRepository;
 import com.cymark.estatemanagementsystem.service.EstateService;
 import com.cymark.estatemanagementsystem.service.ProductService;
 import com.cymark.estatemanagementsystem.service.UserService;
 import com.cymark.estatemanagementsystem.specification.ProductSpecification;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,6 +43,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final UserService userService;
     private final EstateService estateService;
+    private final OrderRepository orderRepository;
 
     @Override
     public ProductDto createProduct(ProductDto productDto) {
@@ -76,6 +82,10 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    private void doSomething(String email, String productId) {
+//        orderRepository.get
+    }
+
     private void validateProductRequest(ProductDto productDto) {
         if(Objects.isNull(productDto.getName()) || productDto.getName().isEmpty()){
             throw new UserException("Product name cannot be empty");
@@ -94,5 +104,48 @@ public class ProductServiceImpl implements ProductService {
         if(optionalProduct.isPresent()){
             throw new UserException("a category for name and designation already exists");
         }
+    }
+
+    public PaginatedResponse<List<ProductDto>> findFirstByProductIdAndEmailAddressAndStatus(int page, int size, String name, String designation, Boolean isPublished){
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        log.info("Request to fetch all estates page : {}, size {}, name : {}, designation : {} ", page,size,name,designation);
+        try {
+            Specification<Product> spec = Specification.where(
+                            ProductSpecification.nameEqual(name))
+                    .and(ProductSpecification.publishedEquals(isPublished))
+                    .and(ProductSpecification.designationEqual(designation));
+
+            Page<Product> products = productRepository.findAll(spec, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));
+
+            PaginatedResponse<List<ProductDto>> paginatedResponse = new PaginatedResponse<>();
+            paginatedResponse.setPage(products.getNumber());
+            paginatedResponse.setSize(products.getSize());
+            paginatedResponse.setTotal((int) productRepository.count());
+            List<ProductDto> productDtos = new ArrayList<>();
+
+            products.getContent().forEach(product -> {
+                ProductDto productDto = new ProductDto();
+                Order order = orderRepository.findFirstByProductIdAndEmailAddressAndStatusOrderBySubscribeForDesc(product.getId().toString(), email, OrderStatus.PAYMENT_COMPLETED);
+                productDto.setName(product.getName());
+                productDto.setProductId(product.getId());
+                productDto.setDescription(product.getDescription());
+                productDto.setPrice(product.getPrice());
+                productDto.setLastPaid(order.getSubscribeFor());
+                productDto.setTotalPaymentInCurrentYear(getTotalPaidProductPerYear(product.getId().toString()));
+
+                productDtos.add(productDto);
+            });
+            paginatedResponse.setData(productDtos);
+            return paginatedResponse;
+        } catch (Exception e) {
+            log.error("An error occurred while fetching all estates : {}", e.getMessage());
+            throw new UserException("Failed to get all estates " + e.getMessage(), 400);
+        }
+    }
+
+    public BigDecimal getTotalPaidProductPerYear(String productId){
+//        return orderRepository.sumByProductAndStatusAndCurrentYear(productId, OrderStatus.PAYMENT_COMPLETED);
+        return BigDecimal.TEN;
     }
 }

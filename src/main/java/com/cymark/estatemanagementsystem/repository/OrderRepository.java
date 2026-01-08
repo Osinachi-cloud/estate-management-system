@@ -129,4 +129,45 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
+    Optional<Order> findOrderByProductIdAndEmailAddressAndStatus(String productId, String emailAddress, OrderStatus status);
+
+    Order findFirstByProductIdAndEmailAddressAndStatusOrderBySubscribeForDesc(@Param("productId") String productId, @Param("emailAddress") String emailAddress, @Param("status") OrderStatus status);
+
+//    @Query(value = "select sum(amount) from orders where subscribe_for is between this_year and status = :status and productId = :productId", nativeQuery = true)
+//    Order sum(@Param("productId") String productId, @Param("status") OrderStatus status);
+
+//    @Query(value = "SELECT SUM(amount) FROM orders WHERE YEAR(subscribe_for) = YEAR(CURRENT_DATE) AND status = :status AND product_id = :productId", nativeQuery = true)
+//    BigDecimal sumByProductAndStatusAndCurrentYear(
+//            @Param("productId") String productId,
+//            @Param("status") OrderStatus status);
+
+//    @Query(value = "SELECT SUM(amount) FROM orders WHERE EXTRACT(YEAR FROM subscribe_for) = EXTRACT(YEAR FROM CURRENT_DATE) AND status = :status AND product_id = :productId", nativeQuery = true)
+//    BigDecimal sumByProductAndStatusAndCurrentYear(
+//            @Param("productId") String productId,
+//            @Param("status") OrderStatus status);
+
+//    @Query(value = "SELECT SUM(amount) FROM orders WHERE subscribe_for >= DATE_TRUNC('year', CURRENT_DATE) AND subscribe_for < DATE_TRUNC('year', CURRENT_DATE) + INTERVAL '1 year' AND status = :status AND product_id = :productId", nativeQuery = true)
+//    BigDecimal sumByProductAndStatusAndCurrentYear(
+//            @Param("productId") String productId,
+//            @Param("status") OrderStatus status);
+
+//    @Query(value = "SELECT SUM(amount) FROM orders WHERE subscribe_for >= DATE_TRUNC('year', CURRENT_DATE) AND subscribe_for < DATE_TRUNC('year', CURRENT_DATE) + INTERVAL '1 year' AND status = :status AND product_id = :productId", nativeQuery = true)
+//    BigDecimal sumByProductAndStatusAndCurrentYear(
+//            @Param("productId") String productId,
+//            @Param("status") OrderStatus status);
+
+
+    // Keep the SQL query as is (status = ? AND product_id = ?)
+//    @Query(value = "SELECT SUM(amount) FROM orders WHERE subscribe_for >= DATE_TRUNC('year', CURRENT_DATE) AND subscribe_for < DATE_TRUNC('year', CURRENT_DATE) + INTERVAL '1 year' AND status = ? AND product_id = ?", nativeQuery = true)
+//// Swap the method parameters so 'status' is first and 'productId' is second
+//    BigDecimal sumByProductAndStatusAndCurrentYear(
+//            @Param("status") OrderStatus status, // First parameter (binds to status = ?)
+//            @Param("productId") String productId // Second parameter (binds to product_id = ?)
+//    );
+
+
+    @Query(value = "SELECT SUM(amount) FROM orders WHERE subscribe_for >= DATE_TRUNC('year', CURRENT_DATE) AND subscribe_for < DATE_TRUNC('year', CURRENT_DATE) + INTERVAL '1 year' AND status = :status AND product_id = :productId", nativeQuery = true)
+    BigDecimal sumByProductAndStatusAndCurrentYear(
+            @Param("productId") String productId,
+            @Param("status") OrderStatus status);
 }

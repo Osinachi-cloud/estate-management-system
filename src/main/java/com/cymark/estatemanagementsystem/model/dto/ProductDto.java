@@ -7,6 +7,7 @@ import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Data
 public class ProductDto {
@@ -21,6 +22,8 @@ public class ProductDto {
     private Boolean publishStatus;
     private BigDecimal transactionCharge;
     private Estate estate;
+    private LocalDateTime lastPaid;
+    private BigDecimal totalPaymentInCurrentYear;
 
 
     public ProductDto() {}

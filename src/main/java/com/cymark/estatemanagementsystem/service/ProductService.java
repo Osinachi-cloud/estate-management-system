@@ -9,4 +9,6 @@ public interface ProductService {
     ProductDto createProduct(ProductDto productDto);
 
     PaginatedResponse<List<ProductDto>> fetchProductsBy(int page, int size, String name, String designation, Boolean isPublished);
+
+    PaginatedResponse<List<ProductDto>> findFirstByProductIdAndEmailAddressAndStatus(int page, int size, String name, String designation, Boolean isPublished);
 }
