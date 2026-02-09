@@ -31,7 +31,7 @@ public class Estate extends BaseEntity {
     private String estateId;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_admin", referencedColumnName = "user_id", nullable = false)
+    @JoinColumn(name = "user_admin", referencedColumnName = "user_id", nullable = true)
     private UserEntity estateAdminUser;
 
 }

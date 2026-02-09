@@ -46,31 +46,38 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Role createUserRole(RoleDto roleDto){
+    public Role createUserRole(RoleDto roleDto) {
         try {
 
             Optional<Role> roleOptional = roleRepository.findRoleByName(roleDto.getName());
-            if(roleOptional.isPresent()){
-                throw new CymarkException("Role already exists");
+            if (roleOptional.isPresent()) {
+                log.info("Role already exists");
+                return null;
+            } else {
+
+                log.debug("Creating customer with request: {}", roleDto);
+                Role role = new Role();
+                role.setName(roleDto.getName());
+                role.setDescription(roleDto.getDescription());
+
+                Collection<Permission> permissions = new ArrayList<>();
+                Permission permission = new Permission();
+                permission.setName(roleDto.getName());
+                permission.setDescription(roleDto.getDescription());
+                permission.setCategory(roleDto.getName());
+                Optional<Permission> existingPermission = permissionRepository.findByName(roleDto.getName());
+                if (existingPermission.isPresent()) {
+                    log.info("Permission exists already");
+                } else {
+                    Permission savedPermission = permissionRepository.save(permission);
+                    log.info("savedPermission : {}", savedPermission);
+                    permissions.add(savedPermission);
+                }
+                role.setPermissions(permissions);
+
+                return roleRepository.save(role);
             }
-
-            log.debug("Creating customer with request: {}", roleDto);
-            Role role = new Role();
-            role.setName(roleDto.getName());
-            role.setDescription(roleDto.getDescription());
-
-            Collection<Permission> permissions = new ArrayList<>();
-            Permission permission = new Permission();
-            permission.setName(roleDto.getName());
-            permission.setDescription(roleDto.getDescription());
-            permission.setCategory("CUSTOMER");
-            Permission savedPermission = permissionRepository.save(permission);
-            log.info("savedPermission : {}", savedPermission);
-            permissions.add(savedPermission);
-            role.setPermissions(permissions);
-
-            return roleRepository.save(role);
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Error creating role:{}", e.getMessage());
             throw new CymarkException(e.getMessage());
         }
@@ -79,7 +86,7 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public Optional<Role> findRoleByName(String name){
+    public Optional<Role> findRoleByName(String name) {
         System.out.println("in find role method");
 
         return roleRepository.findRoleByName(getStr(name));
@@ -106,8 +113,8 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Response assignRole(String roleName, String phoneNumber) {
 
-        UserEntity admin = adminRepository.findByPhone(phoneNumber).orElseThrow(()-> new CymarkException("admin with id:" + phoneNumber + " does not exist"));
-        Role role = roleRepository.findByName(roleName).orElseThrow(()-> new CymarkException("role with name:" + roleName + " does not exist"));
+        UserEntity admin = adminRepository.findByPhone(phoneNumber).orElseThrow(() -> new CymarkException("admin with id:" + phoneNumber + " does not exist"));
+        Role role = roleRepository.findByName(roleName).orElseThrow(() -> new CymarkException("role with name:" + roleName + " does not exist"));
 
         admin.setRole(role);
         adminRepository.save(admin);
@@ -115,13 +122,13 @@ public class RoleServiceImpl implements RoleService {
         return ResponseUtils.createDefaultSuccessResponse();
     }
 
-    private Collection<Permission> findPermissions(List<Long> ids){
+    private Collection<Permission> findPermissions(List<Long> ids) {
         Collection<Permission> permissionList = new ArrayList<>();
-        for(Long id : ids){
+        for (Long id : ids) {
             Optional<Permission> permissionExists = permissionRepository.findById(id);
-            if(permissionExists.isEmpty()){
+            if (permissionExists.isEmpty()) {
                 continue;
-            }else {
+            } else {
                 Permission permission = permissionExists.get();
                 permissionList.add(permission);
             }
@@ -129,24 +136,25 @@ public class RoleServiceImpl implements RoleService {
         return permissionList;
     }
 
-    private Collection<Permission> addPermissions(List<String> names){
+    private Collection<Permission> addPermissions(List<String> names) {
 
         Collection<Permission> permissionList = new ArrayList<>();
-        for(String name : names){
+        for (String name : names) {
             Optional<Permission> permissionExists = permissionRepository.findByName(name);
-            if(permissionExists.isEmpty()){
+            if (permissionExists.isEmpty()) {
                 continue;
-            }else {
+            } else {
                 Permission permission = permissionExists.get();
                 permissionList.add(permission);
             }
         }
         return permissionList;
     }
+
     @Override
     public RoleDto createRole(RoleDtoRequest roleRequest) {
         Optional<Role> roleExists = roleRepository.findByName(roleRequest.getName());
-        if(roleExists.isPresent()){
+        if (roleExists.isPresent()) {
             throw new CymarkException("Role name already exists");
         }
 
@@ -174,7 +182,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public RoleDto updateRoleAddPermission(String roleName, RoleUpdateRequest roleRequest) {
         Optional<Role> roleExists = roleRepository.findByName(roleName);
-        if(roleExists.isEmpty()){
+        if (roleExists.isEmpty()) {
             throw new CymarkException("Role does not exist");
         }
 
@@ -203,7 +211,7 @@ public class RoleServiceImpl implements RoleService {
     @Override
     public Response deleteRole(String name) {
         try {
-            Role role = roleRepository.findByName(name).orElseThrow(()-> new CymarkException("role with name: " + name + " does not exist"));
+            Role role = roleRepository.findByName(name).orElseThrow(() -> new CymarkException("role with name: " + name + " does not exist"));
             roleRepository.delete(role);
             return ResponseUtils.createDefaultSuccessResponse();
         } catch (Exception e) {

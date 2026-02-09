@@ -45,6 +45,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
             CustomerDto user = getUser(authentication);
 
+            log.info("Login request ===>: {}", user);
+
+
             Token token = tokenUtils.generateAccessAndRefreshToken(user);
 
             LoginResponse loginResponse = new LoginResponse(user, token);

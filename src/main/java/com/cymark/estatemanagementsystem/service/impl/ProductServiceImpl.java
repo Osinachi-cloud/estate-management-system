@@ -27,6 +27,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -47,21 +48,21 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto createProduct(ProductDto productDto) {
-        validateProductRequest(productDto);
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        log.info("Creating product  {}", productDto.getName());
-        log.info("username ==> : {}", username);
-        UserEntity loginUser = userService.getUserByEmail(username);
-        Product product = convertDtoToProduct(productDto);
-        Estate estate = estateService.getEstateById(loginUser.getEstateId());
-        product.setEstate(estate);
-        Product savedProduct = productRepository.save(product);
-        return new ProductDto(savedProduct);
+            validateProductRequest(productDto);
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            log.info("Creating product  {}", productDto.getName());
+            log.info("username ==> : {}", username);
+            UserEntity loginUser = userService.getUserByEmail(username);
+            Product product = convertDtoToProduct(productDto);
+            Estate estate = estateService.getEstateById(loginUser.getEstateId());
+            product.setEstate(estate);
+            Product savedProduct = productRepository.save(product);
+            return new ProductDto(savedProduct);
     }
 
     @Override
     public PaginatedResponse<List<ProductDto>> fetchProductsBy(int page, int size, String name, String designation, Boolean isPublished) {
-        log.info("Request to fetch all estates page: {}, size {}, name : {}, designation : {} ", page,size,name,designation);
+        log.info("Request to fetch all estates page: {}, size {}, name : {}, designation : {} ", page, size, name, designation);
         try {
             Specification<Product> spec = Specification.where(
                             ProductSpecification.nameEqual(name))
@@ -87,29 +88,39 @@ public class ProductServiceImpl implements ProductService {
     }
 
     private void validateProductRequest(ProductDto productDto) {
-        if(Objects.isNull(productDto.getName()) || productDto.getName().isEmpty()){
+        if (Objects.isNull(productDto.getName()) || productDto.getName().isEmpty()) {
             throw new UserException("Product name cannot be empty");
         }
-        if(Objects.isNull(productDto.getDesignation()) || productDto.getDesignation().isEmpty()){
+        if (Objects.isNull(productDto.getDesignation()) || productDto.getDesignation().isEmpty()) {
             throw new UserException("Designation cannot be empty");
         }
-        if (Objects.isNull(productDto.getDescription()) || productDto.getDescription().isEmpty()){
+        if (Objects.isNull(productDto.getDescription()) || productDto.getDescription().isEmpty()) {
             throw new UserException("Description cannot be empty");
         }
-        if (Objects.isNull(productDto.getPrice()) || productDto.getPrice().compareTo(BigDecimal.ZERO) == 0){
+        if (Objects.isNull(productDto.getPrice()) || productDto.getPrice().compareTo(BigDecimal.ZERO) == 0) {
             throw new UserException("Price must be greater than zero");
         }
 
+        Optional<Product> optionalProductByProductName = productRepository.findByName(productDto.getName());
+        if (optionalProductByProductName.isPresent()) {
+            throw new UserException("Product Name already exists");
+        }
+
         Optional<Product> optionalProduct = productRepository.findByNameAndDesignation(productDto.getName(), Designation.valueOf(productDto.getDesignation()));
-        if(optionalProduct.isPresent()){
+        if (optionalProduct.isPresent()) {
             throw new UserException("a category for name and designation already exists");
+        }
+
+        Optional<Product> optionalProductByProductCode = productRepository.findByCode(productDto.getCode());
+        if (optionalProductByProductCode.isPresent()) {
+            throw new UserException("Product code already exists");
         }
     }
 
-    public PaginatedResponse<List<ProductDto>> findFirstByProductIdAndEmailAddressAndStatus(int page, int size, String name, String designation, Boolean isPublished){
+    public PaginatedResponse<List<ProductDto>> findFirstByProductIdAndEmailAddressAndStatus(int page, int size, String name, String designation, Boolean isPublished) {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        log.info("Request to fetch all estates page : {}, size {}, name : {}, designation : {} ", page,size,name,designation);
+        log.info("Request to fetch all estates page : {}, size {}, name : {}, designation : {} ", page, size, name, designation);
         try {
             Specification<Product> spec = Specification.where(
                             ProductSpecification.nameEqual(name))
@@ -131,7 +142,7 @@ public class ProductServiceImpl implements ProductService {
                 productDto.setProductId(product.getId());
                 productDto.setDescription(product.getDescription());
                 productDto.setPrice(product.getPrice());
-                productDto.setLastPaid(order.getSubscribeFor());
+                productDto.setLastPaid(Objects.isNull(order) ? LocalDateTime.of(2025,12,1,1,1) : order.getSubscribeFor());
                 productDto.setTotalPaymentInCurrentYear(getTotalPaidProductPerYear(product.getId().toString()));
 
                 productDtos.add(productDto);
@@ -139,12 +150,12 @@ public class ProductServiceImpl implements ProductService {
             paginatedResponse.setData(productDtos);
             return paginatedResponse;
         } catch (Exception e) {
-            log.error("An error occurred while fetching all estates : {}", e.getMessage());
-            throw new UserException("Failed to get all estates " + e.getMessage(), 400);
+            log.error("An error occurred while fetching products : {}", e.getMessage());
+            throw new UserException("Failed to get products " + e.getMessage(), 400);
         }
     }
 
-    public BigDecimal getTotalPaidProductPerYear(String productId){
+    public BigDecimal getTotalPaidProductPerYear(String productId) {
 //        return orderRepository.sumByProductAndStatusAndCurrentYear(productId, OrderStatus.PAYMENT_COMPLETED);
         return BigDecimal.TEN;
     }

@@ -14,6 +14,7 @@ import com.cymark.estatemanagementsystem.security.service.AuthenticationService;
 import com.cymark.estatemanagementsystem.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,6 +26,7 @@ import static org.springframework.http.HttpStatus.CREATED;
 @RestController
 @RequestMapping(BASE_URL)
 @CrossOrigin(origins = "*")
+@Slf4j
 //@CrossOrigin(origins = "http://localhost:3000")
 @RequiredArgsConstructor
 public class AuthenticationController {
@@ -32,9 +34,10 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final UserService userService;
 
-    @Unsecured
+//    @Unsecured
     @PostMapping("/create-customer")
     public ResponseEntity<BaseResponse<CustomerDto>> createCustomer(@RequestBody @Valid CustomerRequest customerRequest) {
+        log.info("create customer Request :{}", customerRequest);
         CustomerDto customer = userService.createCustomer(customerRequest);
         return new ResponseEntity<>(BaseResponse.success(customer, "Customer created successfully"), CREATED);
     }

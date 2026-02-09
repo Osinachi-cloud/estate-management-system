@@ -78,6 +78,17 @@ public class AppOwnerRoleLoader implements
             log.info("appAdmin : {}", mapRoleToDto(adR));
         }
 
+        Optional<Role> tenantRole = roleRepository.findByName("TENANT");
+
+        if(tenantRole.isPresent()){
+            log.info("Tenant role exist");
+        }else {
+            Role tR = new Role();
+            tR.setName("TENANT");
+            tR.setDescription("Set tenant role");
+            roleRepository.save(tR);
+        }
+
         Optional<UserEntity> existingSuperAdmin = adminRepository.findByEmail("appadmin@ems.com");
 
         if(existingSuperAdmin.isEmpty()){
@@ -98,16 +109,16 @@ public class AppOwnerRoleLoader implements
             estate.setPostalCode("******");
             estate.setCity("Dummy");
             estate.setCountry("Dummy");
-            estate.setEstateId(NumberUtils.generate(10));
+            String estateId = NumberUtils.generate(10);
+            estate.setEstateId(estateId);
             Estate savedEstate = estateRepository.save(estate);
 
             Address add = new Address();
             add.setStreet("Street");
             add.setEstate(savedEstate);
+            addressRepository.save(add);
 
-            Address address = addressRepository.save(add);
-
-            admin.setEstateId(address.getId().toString());
+            admin.setEstateId(estateId);
             admin.setEnabled(true);
             adminRepository.save(admin);
         }

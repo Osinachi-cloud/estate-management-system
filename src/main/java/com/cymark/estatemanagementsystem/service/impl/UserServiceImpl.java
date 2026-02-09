@@ -21,7 +21,7 @@ import com.cymark.estatemanagementsystem.util.DateUtils;
 import com.cymark.estatemanagementsystem.util.NumberUtils;
 import com.cymark.estatemanagementsystem.util.ResponseUtils;
 import com.cymark.estatemanagementsystem.util.UserValidationUtils;
-import lombok.RequiredArgsConstructor;
+import jakarta.annotation.PostConstruct;import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +83,7 @@ public class UserServiceImpl implements UserService {
             System.out.println("==========================");
             customer.setOccupancyVerified(false);
             customer.setEnabled(false);
-            customer.setDesignation(customerRequest.getDesignation());
+            customer.setDesignation(Designation.valueOf(customerRequest.getDesignation()));
             customer.setEstateId(customerRequest.getEstateId());
             customer.setUserId(customerRequest.getPhoneNumber() + customerRequest.getEstateId());
             customer.setLandlordId(customerRequest.getLandlordId());
@@ -91,7 +91,7 @@ public class UserServiceImpl implements UserService {
 
 //            customer.setShortBio(getStr(customerRequest.getShortBio()));
 
-            Optional<Role> optionalRole = roleService.findRoleByName("CUSTOMER");
+            Optional<Role> optionalRole = roleService.findRoleByName("TENANT");
             log.info("optionalRole obj : {}", optionalRole);
 
             if(optionalRole.isPresent()){
@@ -279,8 +279,10 @@ public class UserServiceImpl implements UserService {
     public void assignDesignation(CustomerRequest customerRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
+        log.info("user name of logged in user: {}", username);
+
         if(Objects.equals(username, "anonymousUser")){
-            throw new UserException("User not logged in");
+            throw new UserException("Only logged in User can create another user");
         }
         UserEntity loggedInUser = getUserByEmail(username);
 
@@ -660,28 +662,30 @@ public class UserServiceImpl implements UserService {
     }
 
 //    @PostConstruct
-//    public void initializeSuperAdmin() {
-//
-//        String appOwnerEmail = "app_owner@ems.com";
-//        String phoneNumber = "01234567890";
-//        if(findAppOwnerByEmail(appOwnerEmail)){
-//            log.info("App owner found for email: {}", appOwnerEmail);
-//        } else {
-//            UserEntity customer = new UserEntity();
-//            customer.setEmailAddress(appOwnerEmail);
-//            customer.setPassword(passwordService.encode("1234"));
-//            customer.setFirstName("Rotimi");
-//            customer.setLastName("Ojo");
-//            customer.setPhoneNumber(phoneNumber);
-////            customer.setUserId(phoneNumber);
-////            customer.setUsername(appOwnerEmail);
-//            RoleDto roleDto = new RoleDto("APP_OWNER", "Master Admin");
-//            Role role = roleService.createUserRole(roleDto);
-//            customer.setRole(role);
-//
-//            userRepository.save(customer);
-//        }
-//    }
+    public void initializeSuperAdmin() {
+
+        String appOwnerEmail = "app_owner@ems.com";
+        String phoneNumber = "01234567890";
+        if(findAppOwnerByEmail(appOwnerEmail)){
+            log.info("App owner found for email: {}", appOwnerEmail);
+        } else {
+            UserEntity customer = new UserEntity();
+            customer.setEmail(appOwnerEmail);
+            customer.setPassword(passwordService.encode("1234"));
+            customer.setFirstName("Rotimi");
+            customer.setLastName("Ojo");
+            customer.setDesignation(Designation.LANDLORD);
+            customer.setPhone(phoneNumber);
+//            customer.setUserId(phoneNumber);
+//            customer.setUsername(appOwnerEmail);
+            RoleDto roleDto = new RoleDto("APP_OWNER", "Master Admin");
+            Role role = roleService.createUserRole(roleDto);
+            customer.setRole(role);
+            customer.setEstateId("1234567890");
+
+            userRepository.save(customer);
+        }
+    }
 
     public Response toggleEnableUser(String phone){
         Optional<UserEntity> userEntityOptional = userRepository.findByPhone(phone);

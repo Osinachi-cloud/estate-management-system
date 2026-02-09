@@ -30,7 +30,7 @@ public class CustomerRequest {
     private String phoneNumber;
 
     @NotBlank(message = "designation cannot be blank")
-    private Designation designation;
+    private String designation;
 
     @NotBlank(message = "reference code cannot be blank")
     @NotNull(message = "reference code cannot be null")

@@ -70,7 +70,7 @@ public class OtpServiceImpl implements OtpService {
         }
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
         System.out.println("try 1");
         generateOtp("app_owner@ems.com");
