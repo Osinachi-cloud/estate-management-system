@@ -20,5 +20,10 @@
     </orderEntry>
     <orderEntry type="library" name="Maven: org.springframework.security:spring-security-core:6.4.4" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-tx:6.2.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-context:6.2.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-web:6.2.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-beans:6.2.5" level="project" />
+    <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.17" level="project" />
+    <orderEntry type="library" name="Maven: jakarta.validation:jakarta.validation-api:3.0.2" level="project" />
   </component>
 </module>

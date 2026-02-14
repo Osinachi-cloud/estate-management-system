@@ -5,6 +5,7 @@ import com.cymark.estatemanagementsystem.model.dto.request.CustomerUpdateRequest
 import com.cymark.estatemanagementsystem.model.dto.request.EmailVerificationRequest;
 import com.cymark.estatemanagementsystem.model.dto.response.VerificationResponse;
 import com.cymark.estatemanagementsystem.model.entity.User;
+import com.cymark.estatemanagementsystem.model.entity.UserEntity;
 import com.cymark.estatemanagementsystem.model.request.ContactVerificationRequest;
 import com.cymark.estatemanagementsystem.model.response.BaseResponse;
 import com.cymark.estatemanagementsystem.model.response.PaginatedResponse;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static com.cymark.estatemanagementsystem.util.Constants.BASE_URL;
+import static com.cymark.estatemanagementsystem.util.DtoMapper.convertUserListToDto;
 import static org.springframework.http.HttpStatus.OK;
 
 //@CrossOrigin(origins = "*")
@@ -57,9 +59,10 @@ public class UserController {
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) Long roleId,
-            @RequestParam(required = false) Boolean isActive) {
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) String designation) {
 
-        PaginatedResponse<List<UserDto>> users = userService.fetchAllUsersBy(page, size, firstName, lastName, email, roleId, isActive);
+        PaginatedResponse<List<UserDto>> users = userService.fetchAllUsersBy(page, size, firstName, lastName, email, roleId, isActive, designation);
         return ResponseEntity.ok(BaseResponse.success(users, "Users retrieved successfully"));
     }
 
@@ -87,7 +90,7 @@ public class UserController {
         return ResponseEntity.ok(BaseResponse.success(response, "Profile image updated successfully"));
     }
 
-    @GetMapping("/customer")
+    @GetMapping("/user")
     public ResponseEntity<BaseResponse<CustomerDto>> getCustomer(@RequestParam("customerId") @NotBlank String customerId) {
         CustomerDto customer = userService.getCustomer(customerId);
         return ResponseEntity.ok(BaseResponse.success(customer, "Customer retrieved successfully"));
@@ -128,7 +131,21 @@ public class UserController {
         return ResponseEntity.ok(BaseResponse.success(response, "Email verified successfully"));
     }
 
+    @GetMapping("/find-by-estate-and-designation")
+    public ResponseEntity<BaseResponse<List<UserDto>>> findByEstateIdAndDesignation(
+            @RequestParam("estateId") String estateId, @RequestParam("designation")  String designation) {
 
+        List<UserDto> LandlordsListByEstate = userService.findByEstateIdAndDesignation(estateId, designation);
+        return ResponseEntity.ok(BaseResponse.success(LandlordsListByEstate, "Customer retrieved successfully"));
+    }
+
+    @GetMapping("/find-by-landlord-and-designation")
+    public ResponseEntity<BaseResponse<List<UserDto>>> findByLandlordIdAndDesignation(
+            @RequestParam("landlordId") String landlordId, @RequestParam("designation") String designation) {
+
+        List<UserDto> tenantsListByLandLord = userService.findByLandlordIdAndDesignation(landlordId, designation);
+        return ResponseEntity.ok(BaseResponse.success(tenantsListByLandLord, "Customer retrieved successfully"));
+    }
 
 
 //    @PostMapping(value = "allowSaveCard")

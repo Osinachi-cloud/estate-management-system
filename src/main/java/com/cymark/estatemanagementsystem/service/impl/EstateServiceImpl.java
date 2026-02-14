@@ -76,7 +76,7 @@ public class EstateServiceImpl implements EstateService {
 
             System.out.println("user id");
             System.out.println(user.getPhone() + estateId);
-            user.setUserId(user.getPhone() + estateId);
+            user.setUserId(user.getPhone().substring(1) + estateId);
 
             UserEntity newEstateAdmin = userRepository.save(user);
 

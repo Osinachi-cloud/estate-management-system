@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -38,6 +38,6 @@ public class UserDto {
     private String designation;
     private String estate;
     private List<UserDto> subUsersList;
+    private Instant dateCreated;
     protected UserFinancialDetails userFinancialDetails;
-
 }

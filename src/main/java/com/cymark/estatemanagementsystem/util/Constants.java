@@ -42,7 +42,9 @@ public final class Constants {
             "/api/v1/validateEmailCode",
             "/api/v1/request-password-reset",
             "/api/v1/validate-reset-code",
-            "/api/v1/get-estates"
+            "/api/v1/get-estates",
+            "/hierarchy",
+            "/detailed-view"
 
 //            "/api/v1/fetch-customer-orders"
     };

@@ -1,6 +1,7 @@
 package com.cymark.estatemanagementsystem.repository;
 
 import com.cymark.estatemanagementsystem.model.entity.UserEntity;
+import com.cymark.estatemanagementsystem.model.enums.Designation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -21,6 +22,13 @@ public interface UserRepository extends RevisionRepository<UserEntity, Long, Int
 
     Optional<UserEntity> findByUserId(String customerId);
 
+    Optional<UserEntity> findUserEntityByUserId(String userId);
+
+    List<UserEntity> findByEstateIdAndDesignation(String estateId, Designation designation);
+
+    List<UserEntity> findByLandlordIdAndDesignation(String landlordId, Designation designation);
+
+
     @Query("SELECT u FROM UserEntity u WHERE " +
             "(u.landlordId = :userId OR u.tenantId = :userId) and u.estateId = :estateId")
     List<UserEntity> findByLandlordOrTenantIdWhereBothArePresent(@Param("userId") String userId, @Param("estateId") String estateId);
@@ -38,5 +46,7 @@ public interface UserRepository extends RevisionRepository<UserEntity, Long, Int
     Long countAllUsersByDesignation(@Param("designation") String designation);
 
 
+    List<UserEntity> findByLandlordId(String userId);
 
+    List<UserEntity> findByTenantId(String userId);
 }

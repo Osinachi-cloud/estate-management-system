@@ -1,6 +1,7 @@
 package com.cymark.estatemanagementsystem.specification;
 
 import com.cymark.estatemanagementsystem.model.entity.UserEntity;
+import com.cymark.estatemanagementsystem.model.enums.Designation;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.Instant;
@@ -46,6 +47,11 @@ public final class UserSpecification {
     public static Specification<UserEntity> enableEqual(Boolean enabled) {
         return (root, query, builder) ->
                 enabled != null ? builder.equal(root.get("enabled"), enabled) : null;
+    }
+
+    public static Specification<UserEntity> designationEqual(String designation) {
+        return (root, query, builder) ->
+                designation != null ? builder.equal(root.get("designation"), designation) : null;
     }
 
     public static Specification<UserEntity> emailEqual(String emailAddress) {

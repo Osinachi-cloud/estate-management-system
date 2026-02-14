@@ -21,7 +21,7 @@ import com.cymark.estatemanagementsystem.util.DateUtils;
 import com.cymark.estatemanagementsystem.util.NumberUtils;
 import com.cymark.estatemanagementsystem.util.ResponseUtils;
 import com.cymark.estatemanagementsystem.util.UserValidationUtils;
-import jakarta.annotation.PostConstruct;import lombok.RequiredArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.beans.PropertyDescriptor;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -67,7 +66,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public CustomerDto createCustomer(CustomerRequest customerRequest) {
+    public CustomerDto createUserByLandlord(CustomerRequest customerRequest) {
 
         log.info("Creating customer with request: {}", customerRequest);
         try {
@@ -86,6 +85,81 @@ public class UserServiceImpl implements UserService {
             customer.setDesignation(Designation.valueOf(customerRequest.getDesignation()));
             customer.setEstateId(customerRequest.getEstateId());
             customer.setUserId(customerRequest.getPhoneNumber() + customerRequest.getEstateId());
+            customer.setLandlordId(customerRequest.getLandlordId());
+            customer.setTenantId(customerRequest.getTenantId());
+
+//            customer.setShortBio(getStr(customerRequest.getShortBio()));
+
+            Optional<Role> optionalRole = roleService.findRoleByName("TENANT");
+            log.info("optionalRole obj : {}", optionalRole);
+
+            if(optionalRole.isPresent()){
+                Role role = optionalRole.get();
+                customer.setRole(role);
+            }
+
+            customer.setPassword(passwordService.encode(customerRequest.getPassword()));
+            log.info("customer obj 1 : {}", customer);
+
+//            if (Objects.nonNull(customerRequest.getProfileImage())) {
+//                log.info("customer obj 2 : {}", customer);
+//
+//                byte[] imageBytes = Base64.decodeBase64(customerRequest.getProfileImage());
+//                String base64EncodedImage = Base64.encodeBase64String(imageBytes);
+//                customer.setProfileImage(base64EncodedImage);
+//            }
+//
+
+            log.info("customer obj : {}", customer);
+
+            UserEntity newCustomer = userRepository.save(customer);
+
+            return new CustomerDto(newCustomer);
+        } catch (UserException e) {
+            log.error("Custom error occurred while creating customer :: {}", e.getMessage());
+            throw e;
+        } catch (Exception e) {
+            log.error("An Exception occurred in customer creation :: {}", e.getMessage());
+            if (e.getMessage().contains("JDBC exception")){
+                throw new CymarkException("Error inserting user in DB");
+            }
+            throw new CymarkException(e.getMessage());
+        }
+    }
+
+    @Override
+    public List<UserDto> findByEstateIdAndDesignation(String estateId, String designation){
+       List<UserEntity> LandlordsListByEstate = userRepository.findByEstateIdAndDesignation(estateId, Designation.valueOf(designation));
+       return convertUserListToDto(LandlordsListByEstate);
+    }
+
+    @Override
+    public List<UserDto> findByLandlordIdAndDesignation(String landlordId, String designation){
+        List<UserEntity> tenantsListByLandLord =  userRepository.findByLandlordIdAndDesignation(landlordId, Designation.valueOf(designation));
+        return convertUserListToDto(tenantsListByLandLord);
+    }
+
+    @Transactional
+    @Override
+    public CustomerDto createCustomer(CustomerRequest customerRequest) {
+
+        log.info("Creating customer with request: {}", customerRequest);
+        try {
+
+            validate(customerRequest);
+//            assignDesignation(customerRequest);
+
+            UserEntity customer = new UserEntity();
+            customer.setFirstName(customerRequest.getFirstName());
+            customer.setLastName(customerRequest.getLastName());
+            customer.setEmail(customerRequest.getEmail());
+            customer.setPhone(customerRequest.getPhoneNumber());
+            System.out.println("==========================");
+            customer.setOccupancyVerified(false);
+            customer.setEnabled(false);
+            customer.setDesignation(Designation.valueOf(customerRequest.getDesignation()));
+            customer.setEstateId(customerRequest.getEstateId());
+            customer.setUserId(customerRequest.getPhoneNumber().substring(1) + customerRequest.getEstateId());
             customer.setLandlordId(customerRequest.getLandlordId());
             customer.setTenantId(customerRequest.getTenantId());
 
@@ -177,12 +251,14 @@ public class UserServiceImpl implements UserService {
     @Override
     public CustomerDto updateCustomer(CustomerUpdateRequest customerRequest, String emailAddress) {
         log.info("Updating customer with email : {} ,  request: {}", emailAddress, customerRequest);
+
         try {
             UserEntity customer = userRepository.findByEmail(emailAddress)
                     .orElseThrow(() -> new UserException(ResponseStatus.EMAIL_ADDRESS_NOT_FOUND));
             BeanUtils.copyProperties(customerRequest, customer, getNullPropertyNames(customerRequest));
             Role role = roleService.findRoleByName(customerRequest.getRole()).orElseThrow(()-> new UserException("role not found"));
             customer.setRole(role);
+            customer.setDesignation(Designation.valueOf(customerRequest.getDesignation()));
             UserEntity newCustomer = userRepository.save(customer);
 
 //            log.info("Updated customer with ID: {}", newCustomer.getUserId());
@@ -277,6 +353,27 @@ public class UserServiceImpl implements UserService {
     }
 
     public void assignDesignation(CustomerRequest customerRequest) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        log.info("user name of logged in user: {}", username);
+
+        if(Objects.equals(username, "anonymousUser")){
+            throw new UserException("Only logged in User can create another user");
+        }
+        UserEntity loggedInUser = getUserByEmail(username);
+
+        System.out.println( "logged in "  + loggedInUser);
+
+        if(Objects.equals(customerRequest.getDesignation(), Designation.valueOf("TENANT"))) {
+            customerRequest.setLandlordId(loggedInUser.getUserId());
+        }
+
+        if(Objects.equals(customerRequest.getDesignation(), Designation.valueOf("OCCUPANT"))) {
+            customerRequest.setTenantId(loggedInUser.getUserId());
+        }
+    }
+
+    public void assignSelfDesignation(CustomerRequest customerRequest) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
         log.info("user name of logged in user: {}", username);
@@ -631,7 +728,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PaginatedResponse<List<UserDto>> fetchAllUsersBy(int page, int size, String firstName, String lastName, String email, Long roleId, Boolean isActive) {
+    public PaginatedResponse<List<UserDto>> fetchAllUsersBy(int page, int size, String firstName, String lastName, String email, Long roleId, Boolean isActive, String designation) {
 
         log.info("Request to fetch all users page: {}, size {}, firstName : {}, lastName : {}, email: {}, role Id : {} ", page,size,firstName,lastName, email,roleId);
         try {
@@ -640,6 +737,7 @@ public class UserServiceImpl implements UserService {
                     .and(UserSpecification.lastNameEqual(lastName))
                     .and(UserSpecification.roleIdEqual(roleId))
                     .and(UserSpecification.enableEqual(isActive))
+                    .and(UserSpecification.designationEqual(designation))
                     .and(UserSpecification.emailEqual(email));
 
             Page<UserEntity> users = userRepository.findAll(spec, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));

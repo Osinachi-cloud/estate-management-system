@@ -99,7 +99,7 @@ public class AppOwnerRoleLoader implements
             admin.setPassword(passwordService.encode("AB$12345"));
             admin.setEmail("appadmin@ems.com");
             admin.setDesignation(Designation.EXTERNAL);
-            admin.setUserId("+23409876541");
+            admin.setUserId("23409876541");
 //            admin.setUsername("admin@ems.com");
 //            admin.setUserId(NumberUtils.generate(9));
             admin.setRole(adR);

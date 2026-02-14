@@ -22,4 +22,6 @@ public class CustomerUpdateRequest {
     private boolean enabled;
 
     private String role;
+
+    private String designation;
 }

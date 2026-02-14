@@ -18,6 +18,13 @@ import java.util.List;
 public interface UserService {
 
 
+    CustomerDto createUserByLandlord(CustomerRequest customerRequest);
+
+    List<UserDto> findByEstateIdAndDesignation(String estateId, String designation);
+
+    List<UserDto> findByLandlordIdAndDesignation(String landlordId, String designation);
+
+    @Transactional
     CustomerDto createCustomer(CustomerRequest customerRequest);
 
     @Transactional
@@ -55,7 +62,7 @@ public interface UserService {
 
     Response allowSaveCard(String customerId, Boolean saveCard);
 
-    PaginatedResponse<List<UserDto>> fetchAllUsersBy(int page, int size, String firstName, String lastName, String email, Long roleId, Boolean isActive);
+    PaginatedResponse<List<UserDto>> fetchAllUsersBy(int page, int size, String firstName, String lastName, String email, Long roleId, Boolean isActive, String designation);
 
     Response toggleEnableUser(String phone);
 

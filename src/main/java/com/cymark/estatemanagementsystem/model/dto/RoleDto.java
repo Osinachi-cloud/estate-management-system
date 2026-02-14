@@ -1,6 +1,7 @@
 package com.cymark.estatemanagementsystem.model.dto;
 
 import com.cymark.estatemanagementsystem.model.entity.Role;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

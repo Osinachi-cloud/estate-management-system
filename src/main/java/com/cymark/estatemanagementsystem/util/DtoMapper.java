@@ -127,6 +127,7 @@ public class DtoMapper {
             userDto.setDesignation(userEntity.getDesignation().toString());
             userDto.setUserId(userEntity.getUserId());
             userDto.setEnabled(userEntity.isEnabled());
+            userDto.setDateCreated(userEntity.getDateCreated());
            return  userDto;
         }).toList();
 

@@ -15,7 +15,6 @@ import com.cymark.estatemanagementsystem.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +33,15 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final UserService userService;
 
-//    @Unsecured
+    @Unsecured
+    @PostMapping("/create-user-by-landlord")
+    public ResponseEntity<BaseResponse<CustomerDto>> createUserByLandlord(@RequestBody @Valid CustomerRequest customerRequest) {
+        log.info("create customer Request :{}", customerRequest);
+        CustomerDto customer = userService.createUserByLandlord(customerRequest);
+        return new ResponseEntity<>(BaseResponse.success(customer, "Customer created successfully"), CREATED);
+    }
+
+    @Unsecured
     @PostMapping("/create-customer")
     public ResponseEntity<BaseResponse<CustomerDto>> createCustomer(@RequestBody @Valid CustomerRequest customerRequest) {
         log.info("create customer Request :{}", customerRequest);
