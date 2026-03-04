@@ -280,8 +280,11 @@ public class PaymentServiceImpl implements PaymentService {
         if (Objects.isNull(paymentVerificationResponse) || Objects.isNull(paymentVerificationResponse.getData())) {
             throw new PaymentException("Failed to get transaction details from Paystack ", 417);
         }
+//        transaction.setUserId(paymentVerificationResponse.getData().getCustomer().getEmail());
 
-                transaction.setUserId(paymentVerificationResponse.getData().getCustomer().getEmail());
+        UserEntity user = userRepository.findByEmail(paymentVerificationResponse.getData().getCustomer().getEmail()).orElseThrow(()-> new RuntimeException("User not found"));
+        transaction.setUserId(paymentVerificationResponse.getData().getCustomer().getEmail());
+        transaction.setDesignation(user.getDesignation());
         transaction.setTransactionId(paymentVerificationResponse.getData().getReference());
         transaction.setReference(paymentVerificationResponse.getData().getReference());
         transaction.setAmount(paymentVerificationResponse.getData().getAmount().divide(BigDecimal.valueOf(100)));

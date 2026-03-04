@@ -65,8 +65,9 @@ public class AuthenticationController {
 
     @Unsecured
     @PostMapping("/request-password-reset")
-    public ResponseEntity<BaseResponse<Response>> requestPasswordReset(@RequestParam("emailAddress") String emailAddress) {
-        Response response = userService.requestPasswordReset(emailAddress);
+    public ResponseEntity<BaseResponse<Response>> requestPasswordReset(@RequestBody PasswordResetRequest passwordResetRequest) {
+        System.out.println("email ---> " + passwordResetRequest.getEmail());
+        Response response = userService.requestPasswordReset(passwordResetRequest.getEmail());
         return ResponseEntity.ok(BaseResponse.success(response, "Password reset instructions sent"));
     }
 
@@ -76,7 +77,6 @@ public class AuthenticationController {
         Response response = userService.resetPassword(passwordResetRequest);
         return ResponseEntity.ok(BaseResponse.success(response, "Password reset successfully"));
     }
-
 
     @Unsecured
     @PostMapping("/validate-reset-code")

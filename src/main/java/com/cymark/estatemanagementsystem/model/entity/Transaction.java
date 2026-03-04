@@ -1,5 +1,6 @@
 package com.cymark.estatemanagementsystem.model.entity;
 
+import com.cymark.estatemanagementsystem.model.enums.Designation;
 import com.cymark.estatemanagementsystem.model.enums.PaymentMode;
 import com.cymark.estatemanagementsystem.model.enums.TransactionStatus;
 import com.cymark.estatemanagementsystem.model.enums.TransactionType;
@@ -48,6 +49,10 @@ public class Transaction extends com.cymark.estatemanagementsystem.model.entity.
 
     @Column(name = "user_id")
     private String userId;
+
+    @Column(name = "designation")
+    @Enumerated(EnumType.STRING)
+    private Designation designation;
 
     @Column(name = "payment_card_id")
     private String paymentCardId;

@@ -18,6 +18,9 @@ public interface UserRepository extends RevisionRepository<UserEntity, Long, Int
 
     Optional<UserEntity> findByEmail(String emailAddress);
 
+    UserEntity findUserEntityByEmail(String emailAddress);
+
+
     Optional<UserEntity> findByPhone(String phoneNumber);
 
     Optional<UserEntity> findByUserId(String customerId);

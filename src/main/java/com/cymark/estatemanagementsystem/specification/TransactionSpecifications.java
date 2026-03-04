@@ -3,8 +3,10 @@ package com.cymark.estatemanagementsystem.specification;
 
 import com.cymark.estatemanagementsystem.model.entity.Order;
 import com.cymark.estatemanagementsystem.model.entity.Transaction;
+import com.cymark.estatemanagementsystem.model.enums.Designation;
 import com.cymark.estatemanagementsystem.model.enums.TransactionStatus;
 import jakarta.persistence.criteria.Predicate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDate;
@@ -12,16 +14,21 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 public class TransactionSpecifications {
 
     public static Specification<Transaction> withFilters(
             String reference,
             TransactionStatus status,
+            Designation designation,
             String productName,
             String userId,
             String estateId,
             LocalDateTime fromDate,
             LocalDateTime toDate) {
+
+        log.info("reference: {}, status: {}, designation: {}, productName:{}, userId:{}, estateId:{}, fromDate:{}, toDate:{}",
+                reference, status, designation, productName,userId,estateId,fromDate,toDate);
 
         return (root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -35,6 +42,10 @@ public class TransactionSpecifications {
 
             if (status != null) {
                 predicates.add(criteriaBuilder.equal(root.get("status"), status));
+            }
+
+            if (designation != null) {
+                predicates.add(criteriaBuilder.equal(root.get("designation"), designation));
             }
 
             if (productName != null && !productName.isEmpty()) {

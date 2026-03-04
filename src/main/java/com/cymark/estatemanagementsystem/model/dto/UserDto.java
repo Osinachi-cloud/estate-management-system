@@ -40,4 +40,5 @@ public class UserDto {
     private List<UserDto> subUsersList;
     private Instant dateCreated;
     protected UserFinancialDetails userFinancialDetails;
+    private List<AddressDto> addressDto;
 }

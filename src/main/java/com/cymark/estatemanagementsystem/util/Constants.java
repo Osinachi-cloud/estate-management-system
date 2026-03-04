@@ -41,6 +41,7 @@ public final class Constants {
             "/api/v1/verify-email",
             "/api/v1/validateEmailCode",
             "/api/v1/request-password-reset",
+            "/api/v1/reset-password",
             "/api/v1/validate-reset-code",
             "/api/v1/get-estates",
             "/hierarchy",

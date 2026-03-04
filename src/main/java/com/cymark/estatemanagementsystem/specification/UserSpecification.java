@@ -39,6 +39,11 @@ public final class UserSpecification {
                 lastName != null ? builder.equal(root.get("lastName"), lastName) : null;
     }
 
+    public static Specification<UserEntity> estateIdEqual(String estateId) {
+        return (root, query, builder) ->
+                estateId != null ? builder.equal(root.get("estateId"), estateId) : null;
+    }
+
     public static Specification<UserEntity> roleIdEqual(Long roleId) {
         return (root, query, builder) ->
                 roleId != null ? builder.equal(root.get("role").get("id"), roleId) : null;

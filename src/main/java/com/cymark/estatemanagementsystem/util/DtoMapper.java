@@ -111,6 +111,24 @@ public class DtoMapper {
         return stringList;
     }
 
+    public static AddressDto addressToDto(Address address){
+        AddressDto addressDto = new AddressDto();
+
+        addressDto.setHouseNumber(address.getHouseNumber());
+        addressDto.setFullAddress(address.getFullAddress());
+        addressDto.setStreet(address.getStreet());
+        addressDto.setApartmentNumber(address.getApartmentNumber());
+
+        return addressDto;
+    }
+
+    public static List<AddressDto> addressToDtoList(Collection<Address> addresses){
+        return addresses.stream().map(address -> {
+            System.out.println(address);
+            return addressToDto(address);
+        }).toList();
+    }
+
     public static List<UserDto> convertUserListToDto(List<UserEntity> userEntityList) {
 
         return userEntityList.stream().map(userEntity -> {
@@ -130,7 +148,6 @@ public class DtoMapper {
             userDto.setDateCreated(userEntity.getDateCreated());
            return  userDto;
         }).toList();
-
     }
 
     public static List<EstateDto> convertEstateListToDto(List<Estate> estateList) {

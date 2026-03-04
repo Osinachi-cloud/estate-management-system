@@ -16,6 +16,7 @@ public class UserValidationUtils {
 
     public static boolean isValidEmail(String email) {
         return EMAIL_PATTERN.matcher(email).matches();
+//        return true;
     }
 
     public static boolean isValidPhoneNumber(String phoneNumber) {

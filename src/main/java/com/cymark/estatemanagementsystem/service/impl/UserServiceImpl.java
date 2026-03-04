@@ -5,10 +5,7 @@ import com.cymark.estatemanagementsystem.model.dto.*;
 import com.cymark.estatemanagementsystem.model.dto.request.CustomerRequest;
 import com.cymark.estatemanagementsystem.model.dto.request.CustomerUpdateRequest;
 import com.cymark.estatemanagementsystem.model.dto.request.PasswordResetRequest;
-import com.cymark.estatemanagementsystem.model.entity.ContactVerification;
-import com.cymark.estatemanagementsystem.model.entity.Estate;
-import com.cymark.estatemanagementsystem.model.entity.Role;
-import com.cymark.estatemanagementsystem.model.entity.UserEntity;
+import com.cymark.estatemanagementsystem.model.entity.*;
 import com.cymark.estatemanagementsystem.model.enums.Designation;
 import com.cymark.estatemanagementsystem.model.enums.ResponseStatus;
 import com.cymark.estatemanagementsystem.model.request.AdminCustomerRequest;
@@ -46,8 +43,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import static com.cymark.estatemanagementsystem.util.DtoMapper.convertRoleToDto;
-import static com.cymark.estatemanagementsystem.util.DtoMapper.convertUserListToDto;
+import static com.cymark.estatemanagementsystem.util.DtoMapper.*;
 
 
 @Service
@@ -61,6 +57,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordService passwordService;
     private final EstateRepository estateRepository;
     private final TransactionService transactionService;
+    private final AddressRepository addressRepository;
 
     private final RoleService roleService;
 
@@ -747,11 +744,68 @@ public class UserServiceImpl implements UserService {
             paginatedResponse.setSize(users.getSize());
             paginatedResponse.setTotal((int) userRepository.count());
             paginatedResponse.setData(convertUserListToDto(users.getContent()));
+
             return paginatedResponse;
         } catch (Exception e) {
             log.error("An error occurred while fetching all users : {}", e.getMessage());
             throw new UserException("Failed to get all users ", 400);
         }
+    }
+
+    @Override
+    public PaginatedResponse<List<UserDto>> fetchAllUsersByEstate(int page, int size, String firstName, String lastName, String email, Long roleId, Boolean isActive, String designation) {
+        String userEmail = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        String estateId = userRepository.findUserEntityByEmail(userEmail).getEstateId();
+
+        log.info("Request to fetch all users page: {}, size {}, firstName : {}, lastName : {}, email: {}, role Id : {} ", page,size,firstName,lastName, email,roleId);
+        try {
+            Specification<UserEntity> spec = Specification.where(
+                            UserSpecification.firstNameEqual(firstName))
+                    .and(UserSpecification.lastNameEqual(lastName))
+                    .and(UserSpecification.estateIdEqual(estateId))
+                    .and(UserSpecification.roleIdEqual(roleId))
+                    .and(UserSpecification.enableEqual(isActive))
+                    .and(UserSpecification.designationEqual(designation))
+                    .and(UserSpecification.emailEqual(email));
+
+            Page<UserEntity> users = userRepository.findAll(spec, PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateCreated")));
+
+            PaginatedResponse<List<UserDto>> paginatedResponse = new PaginatedResponse<>();
+            paginatedResponse.setPage(users.getNumber());
+            paginatedResponse.setSize(users.getSize());
+            paginatedResponse.setTotal((int) userRepository.count());
+            paginatedResponse.setData(convertUserListToDto(users.getContent()));
+
+            return paginatedResponse;
+        } catch (Exception e) {
+            log.error("An error occurred while fetching all users : {}", e.getMessage());
+            throw new UserException("Failed to get all users ", 400);
+        }
+    }
+
+    public List<UserDto> convertUserListToDto(List<UserEntity> userEntityList) {
+
+        return userEntityList.stream().map(userEntity -> {
+            UserDto userDto = new UserDto();
+            userDto.setFirstName(userEntity.getFirstName());
+            userDto.setLastName(userEntity.getLastName());
+            userDto.setEmail(userEntity.getEmail());
+            userDto.setPhoneNumber(userEntity.getPhone());
+            userDto.setRole(convertRoleToDto(userEntity.getRole()));
+            userDto.setProfileImage(userEntity.getProfileImage());
+            userDto.setShortBio(userEntity.getShortBio());
+            userDto.setLandlordId(userEntity.getLandlordId());
+            userDto.setTenantId(userEntity.getTenantId());
+            userDto.setDesignation(userEntity.getDesignation().toString());
+            userDto.setUserId(userEntity.getUserId());
+            userDto.setEnabled(userEntity.isEnabled());
+            userDto.setDateCreated(userEntity.getDateCreated());
+            userDto.setAddressDto(addressToDtoList(userEntity.getAddresses()));
+
+            return  userDto;
+        }).toList();
+
     }
 
     private boolean findAppOwnerByEmail(String email) {

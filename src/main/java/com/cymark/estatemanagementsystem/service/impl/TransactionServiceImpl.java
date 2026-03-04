@@ -3,10 +3,13 @@ package com.cymark.estatemanagementsystem.service.impl;
 import com.cymark.estatemanagementsystem.model.dto.EstateTransactionStatistics;
 import com.cymark.estatemanagementsystem.model.dto.UserTransactionStatistics;
 import com.cymark.estatemanagementsystem.model.entity.Transaction;
+import com.cymark.estatemanagementsystem.model.entity.UserEntity;
+import com.cymark.estatemanagementsystem.model.enums.Designation;
 import com.cymark.estatemanagementsystem.model.enums.OrderStatus;
 import com.cymark.estatemanagementsystem.model.enums.TransactionStatus;
 import com.cymark.estatemanagementsystem.repository.OrderRepository;
 import com.cymark.estatemanagementsystem.repository.TransactionRepository;
+import com.cymark.estatemanagementsystem.repository.UserRepository;
 import com.cymark.estatemanagementsystem.service.TransactionService;
 import com.cymark.estatemanagementsystem.specification.TransactionSpecifications;
 import lombok.RequiredArgsConstructor;
@@ -34,11 +37,13 @@ import static com.cymark.estatemanagementsystem.model.enums.OrderStatus.PAYMENT_
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final OrderRepository orderRepository;
+    private final UserRepository userRepository;
 
 //    @Override
     public Page<Transaction> getTransactionsWithFilters1(
             String reference,
             TransactionStatus status,
+            String designation,
             String productName,
             String userId,
             LocalDate fromDate,
@@ -63,6 +68,7 @@ public class TransactionServiceImpl implements TransactionService {
         return transactionRepository.findTransactionsWithFilters(
                 reference,
                 status,
+                designation,
                 productName,
                 userId,
                 fromDateTime,
@@ -94,6 +100,7 @@ public class TransactionServiceImpl implements TransactionService {
     public Page<Transaction> getTransactionsWithFilters(
             String reference,
             TransactionStatus status,
+            Designation designation,
             String productName,
             String userId,
             String estateId,
@@ -109,7 +116,7 @@ public class TransactionServiceImpl implements TransactionService {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Specification<Transaction> spec = TransactionSpecifications.withFilters(
-                reference, status, productName, userId, estateId, fromDateTime, toDateTime);
+                reference, status, designation, productName, userId, estateId, fromDateTime, toDateTime);
 
         return transactionRepository.findAll(spec, pageable);
     }

@@ -38,6 +38,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     @Query("SELECT t FROM Transaction t WHERE " +
             "(:reference IS NULL OR LOWER(t.reference) LIKE LOWER(CONCAT('%', :reference, '%'))) AND " +
             "(:status IS NULL OR t.status = :status) AND " +
+            "(:designation IS NULL OR t.designation = :designation) AND " +
             "(:productName IS NULL OR LOWER(t.productName) LIKE LOWER(CONCAT('%', :productName, '%'))) AND " +
             "(:userId IS NULL OR t.userId = :userId) AND " +
             "(:fromDate IS NULL OR t.createdAt >= :fromDate) AND " +
@@ -45,6 +46,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
     Page<Transaction> findTransactionsWithFilters(
             @Param("reference") String reference,
             @Param("status") TransactionStatus status,
+            @Param("designation") String designation,
             @Param("productName") String productName,
             @Param("userId") String userId,
             @Param("fromDate") LocalDateTime fromDate,

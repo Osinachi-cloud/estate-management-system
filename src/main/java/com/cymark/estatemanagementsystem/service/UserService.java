@@ -64,6 +64,8 @@ public interface UserService {
 
     PaginatedResponse<List<UserDto>> fetchAllUsersBy(int page, int size, String firstName, String lastName, String email, Long roleId, Boolean isActive, String designation);
 
+    PaginatedResponse<List<UserDto>> fetchAllUsersByEstate(int page, int size, String firstName, String lastName, String email, Long roleId, Boolean isActive, String designation);
+
     Response toggleEnableUser(String phone);
 
     UserEntity getUserByEmail(String email);

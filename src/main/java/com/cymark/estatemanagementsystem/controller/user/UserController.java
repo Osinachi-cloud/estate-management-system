@@ -13,17 +13,21 @@ import com.cymark.estatemanagementsystem.model.response.Response;
 import com.cymark.estatemanagementsystem.security.model.Unsecured;
 import com.cymark.estatemanagementsystem.security.service.AuthenticationService;
 import com.cymark.estatemanagementsystem.service.ContactVerificationService;
+import com.cymark.estatemanagementsystem.service.ExcelExportService;
 import com.cymark.estatemanagementsystem.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.cymark.estatemanagementsystem.util.Constants.BASE_URL;
@@ -41,6 +45,7 @@ public class UserController {
     private final UserService userService;
     private final AuthenticationService authenticationService;
     private final ContactVerificationService verificationService;
+    private final ExcelExportService excelExportService;
 
     @PreAuthorize("hasAuthority('TOGGLE_ENABLE_USER')")
     @PostMapping("/toggle-enable-user")
@@ -48,6 +53,22 @@ public class UserController {
         log.info("PhoneNum : {} ", phone);
         Response response = userService.toggleEnableUser(phone);
         return new ResponseEntity<>(BaseResponse.success(response, "User status toggled successfully"), OK);
+    }
+
+    @Unsecured
+    @GetMapping("/get-users-by-estate")
+    public ResponseEntity<BaseResponse<PaginatedResponse<List<UserDto>>>> getUsersByEstate(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) Long roleId,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) String designation) {
+
+        PaginatedResponse<List<UserDto>> users = userService.fetchAllUsersByEstate(page, size, firstName, lastName, email, roleId, isActive, designation);
+        return ResponseEntity.ok(BaseResponse.success(users, "Users retrieved successfully"));
     }
 
     @Unsecured
@@ -153,5 +174,23 @@ public class UserController {
 //        CustomerDto user = authenticationService.getAuthenticatedUser();
 //        return userService.allowSaveCard(user.getUserId(), savedCard);
 //    }
+
+    @Unsecured
+    @GetMapping("/export-users")
+    public void exportUsers(
+            HttpServletResponse response,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) Long roleId,
+            @RequestParam(required = false) Boolean isActive,
+            @RequestParam(required = false) String designation,
+            @RequestParam(defaultValue = "ASC") Sort.Direction sortDirection,
+            @RequestParam(defaultValue = "firstName") String sortProperty) throws IOException {
+
+        excelExportService.exportUsersToExcel(
+                response, firstName, lastName, email, roleId, isActive,
+                designation, sortDirection, sortProperty);
+    }
 }
 

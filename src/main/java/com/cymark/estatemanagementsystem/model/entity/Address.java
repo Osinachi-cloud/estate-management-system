@@ -30,6 +30,9 @@ public class Address extends BaseEntity {
     @ManyToMany(mappedBy = "addresses",fetch = FetchType.EAGER)
     private Collection<UserEntity> userEntities;
 
+//    @OneToOne(mappedBy = "address",fetch = FetchType.EAGER)
+//    private UserEntity userEntity;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "estate_id", referencedColumnName = "estate_id")
     private Estate estate;

@@ -3,6 +3,7 @@ package com.cymark.estatemanagementsystem.controller.transaction;
 import com.cymark.estatemanagementsystem.model.dto.EstateTransactionStatistics;
 import com.cymark.estatemanagementsystem.model.dto.UserTransactionStatistics;
 import com.cymark.estatemanagementsystem.model.entity.Transaction;
+import com.cymark.estatemanagementsystem.model.enums.Designation;
 import com.cymark.estatemanagementsystem.model.enums.TransactionStatus;
 import com.cymark.estatemanagementsystem.model.request.TransactionFilterRequest;
 import com.cymark.estatemanagementsystem.model.response.BaseResponse;
@@ -31,6 +32,7 @@ public class TransactionController {
     public ResponseEntity<BaseResponse<PaginatedResponse<List<Transaction>>>> getTransactions(
             @RequestParam(required = false) String reference,
             @RequestParam(required = false) String status,
+            @RequestParam(required = false) String designation,
             @RequestParam(required = false) String productName,
             @RequestParam(required = false) String userId,
             @RequestParam(required = false) String estateId,
@@ -51,6 +53,16 @@ public class TransactionController {
                 }
             }
 
+            Designation designationEnum = null;
+            if (designation != null && !designation.isEmpty()) {
+                try {
+                    designationEnum = Designation.valueOf(designation.toUpperCase());
+                } catch (IllegalArgumentException e) {
+                    return ResponseEntity.badRequest()
+                            .body(BaseResponse.error(HttpStatus.BAD_REQUEST, "Invalid designation value: " + designation));
+                }
+            }
+
             // Convert date strings to LocalDate
             java.time.LocalDate fromLocalDate = null;
             java.time.LocalDate toLocalDate = null;
@@ -63,7 +75,7 @@ public class TransactionController {
             }
 
             Page<Transaction> transactions = transactionService.getTransactionsWithFilters(
-                    reference, statusEnum, productName, userId, estateId, fromLocalDate, toLocalDate, page, size);
+                    reference, statusEnum, designationEnum, productName, userId, estateId, fromLocalDate, toLocalDate, page, size);
 
             PaginatedResponse<List<Transaction>> pagination = new PaginatedResponse<List<Transaction>>(
                     page,
@@ -88,6 +100,7 @@ public class TransactionController {
             Page<Transaction> transactions = transactionService.getTransactionsWithFilters(
                     filterRequest.getReference(),
                     filterRequest.getStatus(),
+                    Designation.valueOf(filterRequest.getDesignation()),
                     filterRequest.getProductName(),
                     filterRequest.getUserId(),
                     filterRequest.getEstateId(),

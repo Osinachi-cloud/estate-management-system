@@ -25,5 +25,15 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-beans:6.2.5" level="project" />
     <orderEntry type="library" name="Maven: org.slf4j:slf4j-api:2.0.17" level="project" />
     <orderEntry type="library" name="Maven: jakarta.validation:jakarta.validation-api:3.0.2" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot:3.4.4" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.boot:spring-boot-autoconfigure:3.4.4" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.data:spring-data-jpa:3.4.4" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.data:spring-data-commons:3.4.4" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.tomcat.embed:tomcat-embed-core:10.1.39" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi-ooxml:5.2.3" level="project" />
+    <orderEntry type="library" name="Maven: com.zaxxer:HikariCP:5.1.0" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-orm:6.2.5" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework.data:spring-data-envers:3.4.4" level="project" />
+    <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:6.2.5" level="project" />
   </component>
 </module>
