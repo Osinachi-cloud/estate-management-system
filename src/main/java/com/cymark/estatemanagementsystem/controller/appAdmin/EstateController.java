@@ -1,7 +1,7 @@
 package com.cymark.estatemanagementsystem.controller.appAdmin;
 
 import com.cymark.estatemanagementsystem.model.dto.EstateDto;
-import com.cymark.estatemanagementsystem.model.dto.UserDto;
+import com.cymark.estatemanagementsystem.model.entity.Estate;
 import com.cymark.estatemanagementsystem.model.response.BaseResponse;
 import com.cymark.estatemanagementsystem.model.response.PaginatedResponse;
 import com.cymark.estatemanagementsystem.security.model.Unsecured;
@@ -41,7 +41,16 @@ public class EstateController {
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String estateId) {
 
-        PaginatedResponse<List<EstateDto>> users = estateService.fetchAllEstatessBy(page, size, country, state, city, estateId);
+        PaginatedResponse<List<EstateDto>> users = estateService.fetchAllEstatesBy(page, size, country, state, city, estateId);
         return ResponseEntity.ok(BaseResponse.success(users, "Estate retrieved successfully"));
+    }
+
+    @Unsecured
+    @GetMapping("/get-estate")
+    public ResponseEntity<BaseResponse<EstateDto>> getEstateById(
+            @RequestParam(required = false) String estateId) {
+
+        EstateDto estate = estateService.getEstateByEstateId(estateId);
+        return ResponseEntity.ok(BaseResponse.success(estate, "Estate retrieved successfully"));
     }
 }

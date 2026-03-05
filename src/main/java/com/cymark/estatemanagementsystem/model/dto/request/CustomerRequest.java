@@ -44,12 +44,8 @@ public class CustomerRequest {
     private String tenantId;
     private String occupantId;
 
-//    private String country;
-//    private DeviceDto device;
-//    private String profileImage;
-//    private String currency;
-//    private String roleName;
-//    private String username;
-//    private String shortBio;
-//    private boolean isVendor;
+    private Long addressId;
+
+
+
 }

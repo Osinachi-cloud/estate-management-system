@@ -118,6 +118,7 @@ public class DtoMapper {
         addressDto.setFullAddress(address.getFullAddress());
         addressDto.setStreet(address.getStreet());
         addressDto.setApartmentNumber(address.getApartmentNumber());
+        addressDto.setAddressId(address.getId());
 
         return addressDto;
     }
@@ -150,17 +151,19 @@ public class DtoMapper {
         }).toList();
     }
 
+    public static EstateDto convertEstateToDto(Estate estate) {
+        EstateDto estateDto = new EstateDto();
+        estateDto.setCountry(estate.getCountry());
+        estateDto.setState(estate.getState());
+        estateDto.setCity(estate.getCity());
+        estateDto.setName(estate.getName());
+        estateDto.setEstateId(estate.getEstateId());
+
+        return estateDto;
+    }
+
     public static List<EstateDto> convertEstateListToDto(List<Estate> estateList) {
-
-        return estateList.stream().map(userEntity -> {
-            EstateDto estateDto = new EstateDto();
-            estateDto.setCountry(userEntity.getCountry());
-            estateDto.setState(userEntity.getState());
-            estateDto.setCity(userEntity.getCity());
-            estateDto.setEstateId(userEntity.getEstateId());
-            return  estateDto;
-        }).toList();
-
+        return estateList.stream().map(DtoMapper::convertEstateToDto).toList();
     }
 
     public static List<PermissionByCategoryDto> mapToCategoryDto(Collection<Permission> permissionCollection) {

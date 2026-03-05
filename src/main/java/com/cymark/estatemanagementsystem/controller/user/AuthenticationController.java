@@ -44,7 +44,7 @@ public class AuthenticationController {
     @Unsecured
     @PostMapping("/create-customer")
     public ResponseEntity<BaseResponse<CustomerDto>> createCustomer(@RequestBody @Valid CustomerRequest customerRequest) {
-        log.info("create customer Request :{}", customerRequest);
+        log.info("create customer Request  :{}", customerRequest);
         CustomerDto customer = userService.createCustomer(customerRequest);
         return new ResponseEntity<>(BaseResponse.success(customer, "Customer created successfully"), CREATED);
     }

@@ -113,7 +113,7 @@ public class ExcelExportServiceImpl implements ExcelExportService {
         dateStyle.setDataFormat(createHelper.createDataFormat().getFormat("yyyy-mm-dd hh:mm"));
 
         CellStyle currencyStyle = workbook.createCellStyle();
-        currencyStyle.setDataFormat(createHelper.createDataFormat().getFormat("$#,##0.00"));
+        currencyStyle.setDataFormat(createHelper.createDataFormat().getFormat("₦#,##0.00"));
 
         row.createCell(0).setCellValue(user.getFullName() != null ? user.getFullName() : "");
         row.createCell(1).setCellValue(user.getFirstName() != null ? user.getFirstName() : "");

@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.cymark.estatemanagementsystem.util.DtoMapper.convertEstateListToDto;
+import static com.cymark.estatemanagementsystem.util.DtoMapper.convertEstateToDto;
 
 @Service
 @RequiredArgsConstructor
@@ -141,7 +142,7 @@ public class EstateServiceImpl implements EstateService {
     }
 
     @Override
-    public PaginatedResponse<List<EstateDto>> fetchAllEstatessBy(int page, int size, String country, String state, String city, String estateId) {
+    public PaginatedResponse<List<EstateDto>> fetchAllEstatesBy(int page, int size, String country, String state, String city, String estateId) {
 
         log.info("Request to fetch all estates page: {}, size {}, country : {}, state : {}, city: {}, role Id : {} ", page,size,country,state, city,estateId);
         try {
@@ -171,6 +172,16 @@ public class EstateServiceImpl implements EstateService {
         Optional<Estate> optionalEstate = estateRepository.findByEstateId(estateId);
         if (optionalEstate.isPresent()) {
             return optionalEstate.get();
+        }else {
+            throw new UserException(ResponseStatus.INVALID_ESTATE_ID);
+        }
+    }
+
+    @Override
+    public EstateDto getEstateByEstateId(String estateId) {
+        Optional<Estate> optionalEstate = estateRepository.findByEstateId(estateId);
+        if (optionalEstate.isPresent()) {
+            return convertEstateToDto(optionalEstate.get());
         }else {
             throw new UserException(ResponseStatus.INVALID_ESTATE_ID);
         }

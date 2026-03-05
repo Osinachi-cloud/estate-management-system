@@ -1,7 +1,5 @@
 package com.cymark.estatemanagementsystem.model.dto;
 
-
-import com.cymark.estatemanagementsystem.model.entity.Estate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,4 +22,5 @@ public class AddressDto {
     private String fullAddress;
     private String estateId;
     private String userId;
+    private Long addressId;
 }

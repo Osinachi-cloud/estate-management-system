@@ -140,18 +140,19 @@ public class UserServiceImpl implements UserService {
     @Override
     public CustomerDto createCustomer(CustomerRequest customerRequest) {
 
+        Address address = addressRepository.findAddressById(customerRequest.getAddressId());
+        List<Address> addresses = new ArrayList<>();
+        addresses.add(address);
+
         log.info("Creating customer with request: {}", customerRequest);
         try {
 
             validate(customerRequest);
-//            assignDesignation(customerRequest);
-
             UserEntity customer = new UserEntity();
             customer.setFirstName(customerRequest.getFirstName());
             customer.setLastName(customerRequest.getLastName());
             customer.setEmail(customerRequest.getEmail());
             customer.setPhone(customerRequest.getPhoneNumber());
-            System.out.println("==========================");
             customer.setOccupancyVerified(false);
             customer.setEnabled(false);
             customer.setDesignation(Designation.valueOf(customerRequest.getDesignation()));
@@ -159,8 +160,7 @@ public class UserServiceImpl implements UserService {
             customer.setUserId(customerRequest.getPhoneNumber().substring(1) + customerRequest.getEstateId());
             customer.setLandlordId(customerRequest.getLandlordId());
             customer.setTenantId(customerRequest.getTenantId());
-
-//            customer.setShortBio(getStr(customerRequest.getShortBio()));
+            customer.setAddresses(addresses);
 
             Optional<Role> optionalRole = roleService.findRoleByName("TENANT");
             log.info("optionalRole obj : {}", optionalRole);
@@ -169,21 +169,7 @@ public class UserServiceImpl implements UserService {
                 Role role = optionalRole.get();
                 customer.setRole(role);
             }
-
             customer.setPassword(passwordService.encode(customerRequest.getPassword()));
-            log.info("customer obj 1 : {}", customer);
-
-//            if (Objects.nonNull(customerRequest.getProfileImage())) {
-//                log.info("customer obj 2 : {}", customer);
-//
-//                byte[] imageBytes = Base64.decodeBase64(customerRequest.getProfileImage());
-//                String base64EncodedImage = Base64.encodeBase64String(imageBytes);
-//                customer.setProfileImage(base64EncodedImage);
-//            }
-//
-
-            log.info("customer obj : {}", customer);
-
             UserEntity newCustomer = userRepository.save(customer);
 
             return new CustomerDto(newCustomer);

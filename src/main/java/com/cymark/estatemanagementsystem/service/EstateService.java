@@ -11,7 +11,9 @@ public interface EstateService {
     @Transactional
     EstateDto onboardEstate(EstateDto estateRequest);
 
-    PaginatedResponse<List<EstateDto>> fetchAllEstatessBy(int page, int size, String country, String state, String city, String estateId);
+    PaginatedResponse<List<EstateDto>> fetchAllEstatesBy(int page, int size, String country, String state, String city, String estateId);
 
     Estate getEstateById(String estateId);
+
+    EstateDto getEstateByEstateId(String estateId);
 }
