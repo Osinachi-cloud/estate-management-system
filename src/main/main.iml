@@ -35,5 +35,6 @@
     <orderEntry type="library" name="Maven: org.springframework:spring-orm:6.2.5" level="project" />
     <orderEntry type="library" name="Maven: org.springframework.data:spring-data-envers:3.4.4" level="project" />
     <orderEntry type="library" name="Maven: org.springframework:spring-jdbc:6.2.5" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.poi:poi:5.2.3" level="project" />
   </component>
 </module>

@@ -45,7 +45,8 @@ public final class Constants {
             "/api/v1/validate-reset-code",
             "/api/v1/get-estates",
             "/hierarchy",
-            "/detailed-view"
+            "/detailed-view",
+            "/api/v1/export-financial-report"
 
 //            "/api/v1/fetch-customer-orders"
     };
