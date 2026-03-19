@@ -241,7 +241,7 @@ public class UserServiceImpl implements UserService {
             BeanUtils.copyProperties(customerRequest, customer, getNullPropertyNames(customerRequest));
             Role role = roleService.findRoleByName(customerRequest.getRole()).orElseThrow(()-> new UserException("role not found"));
             customer.setRole(role);
-            customer.setDesignation(Designation.valueOf(customerRequest.getDesignation()));
+//            customer.setDesignation(Designation.valueOf(customerRequest.getDesignation()));
             UserEntity newCustomer = userRepository.save(customer);
 
 //            log.info("Updated customer with ID: {}", newCustomer.getUserId());
