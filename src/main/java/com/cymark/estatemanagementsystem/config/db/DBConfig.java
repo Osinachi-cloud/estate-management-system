@@ -155,14 +155,26 @@ public class DBConfig {
         return new DataSourceProperties();
     }
 
+//    @Primary
+//    @Bean("dataSource")
+//    public DataSource dataSource() {
+//        HikariDataSource ds = new HikariDataSource();
+//        ds.setJdbcUrl(url);
+//        ds.setUsername(username);
+//        ds.setDriverClassName("org.postgresql.Driver");
+//        ds.setPassword(password);
+//        return ds;
+//    }
+
     @Primary
     @Bean("dataSource")
     public DataSource dataSource() {
+        log.info("Connecting to DB URL: {}", url);  // add this
         HikariDataSource ds = new HikariDataSource();
-        ds.setJdbcUrl(url);
-        ds.setUsername(username);
+        ds.setJdbcUrl(url.trim());  // also trim for safety
+        ds.setUsername(username.trim());
         ds.setDriverClassName("org.postgresql.Driver");
-        ds.setPassword(password);
+        ds.setPassword(password.trim());
         return ds;
     }
 
