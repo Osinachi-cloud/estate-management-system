@@ -5,6 +5,7 @@ import com.cymark.estatemanagementsystem.model.enums.Designation;
 import com.cymark.estatemanagementsystem.repository.*;
 import com.cymark.estatemanagementsystem.service.PasswordService;
 import com.cymark.estatemanagementsystem.util.NumberUtils;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,7 @@ public class AppOwnerRoleLoader implements
             return;
 
         Permission createAdmin
-                = createPrivilegeIfNotFound("CREATE_SUPER_ADMIN", "create super admin", "owner");
+                = createPrivilegeIfNotFound("CREATE_ESTATE_ADMIN", "create estate super admin", "owner");
 
         Permission createUser
                 = createPrivilegeIfNotFound("ONBOARD_ESTATE", "create an estate", "estate_management");
@@ -152,6 +153,17 @@ public class AppOwnerRoleLoader implements
             role.setPermissions(permissionList);
             log.info("permissionList : {}", permissionList);
             return roleRepository.save(role);
+        }
+    }
+
+    @PostConstruct
+    public void updatePermission(){
+        Optional<Permission> privilege = permissionRepository.findByName("CREATE_SUPER_ADMIN");
+        if (privilege.isPresent()) {
+            Permission permission = privilege.get();
+            permission.setName("CREATE_ESTATE_ADMIN");
+            permission.setDescription("create estate super admin");
+            permissionRepository.save(permission);
         }
     }
 }
