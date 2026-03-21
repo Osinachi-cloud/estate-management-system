@@ -43,7 +43,7 @@ public class PaymentController {
     }
 
     @PostMapping( "/verify-payment")
-    @PreAuthorize("hasAuthority('CUSTOMER')")
+//    @PreAuthorize("hasAuthority('CUSTOMER')")
     public ResponseEntity<PaymentVerificationResponse> verifyPayment(@RequestParam(required = false, name = "reference") String paymentReference) {
         Transaction transaction = new Transaction();
         return ResponseEntity.ok(paymentService.paymentVerification(paymentReference, transaction));

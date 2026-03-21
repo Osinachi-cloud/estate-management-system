@@ -134,7 +134,7 @@ public class PaymentServiceImpl implements PaymentService {
             initializeOrder(request);
             if (initializeTransactionResponse.isStatus()) {
                 log.info("Transaction successfully completed : {}", initializeTransactionResponse);
-                paymentVerification(initializeTransactionResponse.getData().getReference(), transaction);
+//                paymentVerification(initializeTransactionResponse.getData().getReference(), transaction);
             }
             return initializeTransactionResponse;
         } catch (UnsupportedEncodingException e) {
